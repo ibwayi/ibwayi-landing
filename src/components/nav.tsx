@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Compass, Home, User } from "lucide-react";
+import { ArrowUpRight, Compass, Home, User } from "lucide-react";
 import { FloatingNav, type NavItem } from "@/components/aceternity/floating-navbar";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -46,10 +46,11 @@ export function Nav() {
             href="https://fiverr.com/ibwayi"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            aria-label="Fiverr profile (opens in new tab)"
+            className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             <span>Fiverr</span>
-            <span aria-hidden>↗</span>
+            <ArrowUpRight aria-hidden="true" className="ml-1 h-3.5 w-3.5" />
           </a>
         </div>
       }

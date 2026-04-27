@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 
 /**
  * Site footer — three columns on desktop, stacked on mobile.
@@ -101,9 +102,11 @@ export function Footer() {
                 href="https://fiverr.com/ibwayi"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground transition-colors hover:text-foreground"
+                aria-label="Fiverr profile (opens in new tab)"
+                className="inline-flex items-center text-muted-foreground transition-colors hover:text-foreground"
               >
-                Fiverr ↗
+                <span>Fiverr</span>
+                <ArrowUpRight aria-hidden="true" className="ml-1 h-3.5 w-3.5" />
               </a>
             </li>
           </ul>

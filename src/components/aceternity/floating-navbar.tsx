@@ -49,6 +49,20 @@ export function FloatingNav({ navItems, logo, cta, className }: FloatingNavProps
 
   useMotionValueEvent(scrollYProgress, "change", (current) => {
     if (typeof current !== "number") return;
+
+    // Don't run hide-on-scroll on pages that aren't actually scrollable.
+    // Without this, scrollYProgress can flicker on mount (0 → tiny value)
+    // and the direction-detection logic flashes the nav to hidden even
+    // though the user never scrolled.
+    if (typeof document !== "undefined") {
+      const scrollable =
+        document.documentElement.scrollHeight > window.innerHeight + 1;
+      if (!scrollable) {
+        setVisible(true);
+        return;
+      }
+    }
+
     const previous = scrollYProgress.getPrevious() ?? current;
     const direction = current - previous;
 
