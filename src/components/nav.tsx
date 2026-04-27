@@ -102,9 +102,9 @@ export function Nav() {
     [0, TRANSITION_END * 0.7],
     [88, 0], // approx Geist-bold "Ibwayi" + 12px breathing room
   );
-  const navPaddingYMV = useTransform(scrollY, [0, TRANSITION_END], [12, 8]);
-  const navPaddingXMV = useTransform(scrollY, [0, TRANSITION_END], [16, 8]);
-  const navGapMV = useTransform(scrollY, [0, TRANSITION_END], [12, 4]);
+  const navPaddingYMV = useTransform(scrollY, [0, TRANSITION_END], [12, 6]);
+  const navPaddingXMV = useTransform(scrollY, [0, TRANSITION_END], [16, 6]);
+  const navGapMV = useTransform(scrollY, [0, TRANSITION_END], [12, 2]);
 
   // Pin to the compact end-state when reduced-motion is on, or (for the
   // avatar/wordmark) when we're on mobile.
@@ -112,14 +112,14 @@ export function Nav() {
   const fixedWordmark = shouldReduce || isMobile;
 
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4 sm:top-6">
+    <header className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4 sm:top-6 sm:px-6">
       <motion.nav
         style={{
-          paddingTop: shouldReduce ? 8 : navPaddingYMV,
-          paddingBottom: shouldReduce ? 8 : navPaddingYMV,
-          paddingLeft: shouldReduce ? 8 : navPaddingXMV,
-          paddingRight: shouldReduce ? 8 : navPaddingXMV,
-          gap: shouldReduce ? 4 : navGapMV,
+          paddingTop: shouldReduce ? 6 : navPaddingYMV,
+          paddingBottom: shouldReduce ? 6 : navPaddingYMV,
+          paddingLeft: shouldReduce ? 6 : navPaddingXMV,
+          paddingRight: shouldReduce ? 6 : navPaddingXMV,
+          gap: shouldReduce ? 2 : navGapMV,
         }}
         className="pointer-events-auto flex items-center rounded-full border border-border bg-background/80 shadow-lg shadow-black/20 backdrop-blur-md"
       >

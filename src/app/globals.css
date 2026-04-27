@@ -167,10 +167,19 @@
   );
 }
 
-/* Make sure all content sits above the stripe overlay. */
-body > * {
-  position: relative;
-  z-index: 1;
+/*
+ * Make sure all content sits above the stripe overlay.
+ * Wrapped in @layer base so Tailwind's @layer utilities (where .fixed,
+ * .z-50, etc. live) wins. Without the layer wrap, this rule is unlayered
+ * and per Cascade-Layers spec overrides every utility — silently forcing
+ * the Nav <header className="fixed ..."> back to position: relative,
+ * causing it to scroll out of view.
+ */
+@layer base {
+  body > * {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 /*
