@@ -59,19 +59,37 @@ const STEPS: readonly Step[] = [
 ] as const;
 
 /**
- * "How I work" section. Five steps anchored on a vertical flow line.
+ * Snake path connecting five icons in a 1000×1000 viewBox. Path Y values
+ * are spaced (0, 200, 400, 600, 800) to roughly match where icons land
+ * when the five step blocks have similar heights — the path ends slightly
+ * short of the container's bottom because step 5 has its description
+ * below the icon. preserveAspectRatio="none" stretches X/Y independently.
  *
- * Desktop (≥lg): zigzag — even-index steps sit left of the centerline
- * (text-right), odd-index right (text-left). The icon circles punch
- * through the line on `left-1/2`.
+ * Horizontal alternates 30%↔70% across endpoints (300 ↔ 700 in viewBox).
+ * Cubic Bezier control points sit at the midpoint Y of each segment so
+ * the curves form a smooth S between every pair of icons.
+ */
+const SNAKE_PATH =
+  "M 300 0 C 300 100, 700 100, 700 200 C 700 300, 300 300, 300 400 C 300 500, 700 500, 700 600 C 700 700, 300 700, 300 800";
+
+/**
+ * "How I work" section. Five steps anchored on a flow line.
  *
- * Mobile/tablet (<lg): line on the left edge, content stacked to the
- * right. Always text-left.
+ * Desktop (≥lg): a SVG snake path connects icons that alternate at 30%
+ * and 70% horizontal. Each step's content sits on the wide side opposite
+ * its icon (icon at 30% → content fills right; icon at 70% → content
+ * fills left). Path's pathLength animates 0→1 as the user scrolls the
+ * section through the viewport.
  *
- * The flow line is two stacked elements: a permanent grey track and a
- * violet "progress" line that scales 0→1 vertically as the user scrolls
- * the section through the viewport. With `prefers-reduced-motion`, the
- * progress line is static at scaleY=1 from first paint.
+ * Mobile/tablet (<lg): a straight vertical line at left-4 (since a snake
+ * doesn't fit a 375px viewport sensibly). Same 0→1 progress via scaleY
+ * on a violet overlay <div>.
+ *
+ * Reduced-motion: line/path renders fully drawn at first paint.
+ *
+ * Background shapes: three very-blurred violet circles (4%/3%/3% alpha)
+ * sit absolutely behind the section content for depth. `overflow-hidden`
+ * on the section keeps them from bleeding into the page edges.
  */
 export function Process() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -84,11 +102,18 @@ export function Process() {
     offset: ["start 0.8", "end 0.2"],
   });
 
-  // 0 → 1 as the user scrolls the section through the viewport.
-  const lineProgress = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  const progress = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
   return (
-    <section className="relative py-20 md:py-28 lg:py-32">
+    <section className="relative overflow-hidden py-20 md:py-28 lg:py-32">
+      {/* Decorative background shapes — kept very subtle (3-4% alpha)
+          so they read as ambient depth, not as decoration. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute top-1/4 -left-32 h-96 w-96 rounded-full bg-accent-brand/[0.04] blur-3xl" />
+        <div className="absolute top-1/2 -right-32 h-[32rem] w-[32rem] rounded-full bg-accent-brand/[0.03] blur-3xl" />
+        <div className="absolute bottom-1/4 left-1/3 h-80 w-80 rounded-full bg-accent-brand/[0.03] blur-3xl" />
+      </div>
+
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           variants={containerVariant}
@@ -118,20 +143,45 @@ export function Process() {
         </motion.div>
 
         <div ref={containerRef} className="relative">
-          {/* Background grey line — permanent track. */}
+          {/* Mobile/tablet: straight vertical line at left-4 (2 stacked
+              divs — grey track + animated violet overlay). */}
           <div
             aria-hidden
-            className="absolute top-0 bottom-0 left-4 w-px bg-border lg:left-1/2 lg:-translate-x-px"
+            className="absolute top-0 bottom-0 left-4 w-px bg-border lg:hidden"
           />
-
-          {/* Progress violet line — scales 0→1 as user scrolls. */}
           <motion.div
             aria-hidden
-            style={{
-              scaleY: shouldReduce ? 1 : lineProgress,
-            }}
-            className="absolute top-0 left-4 h-full w-px origin-top bg-accent-brand lg:left-1/2 lg:-translate-x-px"
+            style={{ scaleY: shouldReduce ? 1 : progress }}
+            className="absolute top-0 left-4 h-full w-px origin-top bg-accent-brand lg:hidden"
           />
+
+          {/* Desktop: SVG snake path. preserveAspectRatio="none" lets the
+              path stretch with the container; pathLength drives the
+              violet draw-in. */}
+          <svg
+            aria-hidden
+            className="pointer-events-none absolute inset-0 hidden h-full w-full lg:block"
+            viewBox="0 0 1000 1000"
+            preserveAspectRatio="none"
+          >
+            <path
+              d={SNAKE_PATH}
+              stroke="currentColor"
+              strokeWidth="2"
+              fill="none"
+              vectorEffect="non-scaling-stroke"
+              className="text-border"
+            />
+            <motion.path
+              d={SNAKE_PATH}
+              stroke="currentColor"
+              strokeWidth="2"
+              fill="none"
+              vectorEffect="non-scaling-stroke"
+              style={{ pathLength: shouldReduce ? 1 : progress }}
+              className="text-accent-brand"
+            />
+          </svg>
 
           <div className="space-y-16 md:space-y-24">
             {STEPS.map((step, index) => (
@@ -161,23 +211,37 @@ function StepRow({ step, isEven }: { step: Step; isEven: boolean }) {
       viewport={{ once: true, margin: "-150px" }}
       className="relative"
     >
-      {/* Icon circle on the line. */}
-      <div className="absolute top-0 left-4 z-10 -translate-x-1/2 lg:left-1/2">
+      {/*
+       * Icon circle:
+       * - Mobile (<lg): sits on the left line (left-4).
+       * - Desktop (≥lg): sits on the snake — even-index at 30%, odd
+       *   at 70%. The pair of `lg:left-[30%]` / `lg:left-[70%]` classes
+       *   are static literals so Tailwind's compiler picks both up.
+       */}
+      <div
+        className={cn(
+          "absolute top-0 left-4 z-10 -translate-x-1/2",
+          isEven ? "lg:left-[30%]" : "lg:left-[70%]",
+        )}
+      >
         <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-border bg-background">
           <Icon className="h-4 w-4 text-foreground" />
         </div>
       </div>
 
-      {/* Step content. Mobile: always to the right of the line. Desktop:
-          even index sits left of centerline (text-right), odd sits right
-          of centerline (text-left). The 3rem gutter keeps content off
-          the line/icon. */}
+      {/*
+       * Content sits on the WIDE side opposite the icon. With icons at
+       * 30%/70%, the wide side is 70% of the container. text-left when
+       * content fills from left edge of the icon, text-right when it
+       * ends at the icon. Mobile keeps everything to the right of the
+       * line (ml-16, text-left).
+       */}
       <div
         className={cn(
           "ml-16 lg:ml-0",
           isEven
-            ? "lg:pr-[calc(50%+3rem)] lg:text-right"
-            : "lg:pl-[calc(50%+3rem)] lg:text-left",
+            ? "lg:pl-[35%] lg:text-left"
+            : "lg:pr-[35%] lg:text-right",
         )}
       >
         <h3 className="font-display text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
