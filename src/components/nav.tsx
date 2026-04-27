@@ -50,7 +50,7 @@ function NavItem({
     <Link
       href={href}
       className={cn(
-        "relative cursor-pointer rounded-full px-3 py-2 text-sm font-medium transition-colors sm:px-4",
+        "relative cursor-pointer rounded-full px-2.5 py-2 text-sm font-medium transition-colors sm:px-4",
         active
           ? "text-accent-brand"
           : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -72,15 +72,15 @@ export function Nav() {
 
   return (
     <header className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4 sm:top-6">
-      <nav className="pointer-events-auto flex items-center gap-1 rounded-full border border-border bg-background/80 px-2 py-2 shadow-lg shadow-black/20 backdrop-blur-md">
+      <nav className="pointer-events-auto flex items-center gap-0.5 rounded-full border border-border bg-background/80 px-1.5 py-2 shadow-lg shadow-black/20 backdrop-blur-md sm:gap-1 sm:px-2">
         <Link
           href="/"
-          className="cursor-pointer rounded-full px-3 py-2 text-sm font-bold tracking-tight text-foreground transition-colors hover:text-accent-brand"
+          className="cursor-pointer rounded-full px-2.5 py-2 text-sm font-bold tracking-tight text-foreground transition-colors hover:text-accent-brand sm:px-3"
         >
           Ibwayi
         </Link>
 
-        <div aria-hidden className="mx-1 h-5 w-px bg-border" />
+        <div aria-hidden className="mx-0.5 h-5 w-px bg-border sm:mx-1" />
 
         {ITEMS.map((item) => (
           <NavItem
@@ -92,7 +92,7 @@ export function Nav() {
           </NavItem>
         ))}
 
-        <div aria-hidden className="mx-1 h-5 w-px bg-border" />
+        <div aria-hidden className="mx-0.5 h-5 w-px bg-border sm:mx-1" />
 
         <ThemeToggle />
 
@@ -101,7 +101,7 @@ export function Nav() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Fiverr profile (opens in new tab)"
-          className="inline-flex cursor-pointer items-center gap-1 rounded-full px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:px-4"
+          className="inline-flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:px-4"
         >
           <span>Fiverr</span>
           <ArrowUpRight aria-hidden="true" className="h-3.5 w-3.5" />
