@@ -24,12 +24,15 @@ export function ThemeToggle() {
   }
 
   // Pre-mount placeholder — same size as the actual button so the nav doesn't shift.
+  // Mirrors the button's box: p-2 + h-4 w-4 inner = 32×32px.
   if (!mounted) {
     return (
       <span
         aria-hidden
-        className="inline-flex h-8 w-8 items-center justify-center rounded-full"
-      />
+        className="inline-flex items-center justify-center rounded-full p-2"
+      >
+        <span className="block h-4 w-4" />
+      </span>
     );
   }
 
@@ -40,7 +43,7 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label="Toggle theme"
-      className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+      className="inline-flex cursor-pointer items-center justify-center rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
     >
       <motion.span
         key={isDark ? "moon" : "sun"}
