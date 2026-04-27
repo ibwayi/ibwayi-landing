@@ -13,19 +13,19 @@ const fadeUp = {
 
 /**
  * Landing-page hero. Three-line tricolon headline + supporting subline +
- * single primary CTA. Vertically centered in the available viewport
- * (100svh minus the layout's 6rem top-padding for the floating nav).
+ * single primary CTA. Sized via vertical padding (not min-h) so the
+ * section hands off naturally to whatever follows (Service-Cards in 7.3c).
  */
 export function Hero() {
   return (
-    <section className="flex min-h-[calc(100svh-6rem)] w-full flex-col items-center justify-center px-6 py-16 sm:px-10">
+    <section className="w-full px-6 py-24 sm:px-10 md:py-32 lg:py-40">
       <div className="mx-auto flex max-w-5xl flex-col items-center text-center">
         <motion.h1
           variants={fadeUp}
           initial="initial"
           animate="animate"
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-5xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-6xl md:text-7xl xl:text-8xl"
+          className="text-4xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl"
         >
           <span className="block">Custom AI.</span>
           <span className="block">Done right.</span>
@@ -37,9 +37,9 @@ export function Hero() {
           initial="initial"
           animate="animate"
           transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
-          className="mt-8 max-w-2xl text-lg text-muted-foreground sm:text-xl"
+          className="mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl"
         >
-          Chatbots, automations, and MVP web apps — from concept to launch.
+          Chatbots, automations, and MVP web apps. From concept to launch.
         </motion.p>
 
         <motion.div
@@ -48,7 +48,7 @@ export function Hero() {
           animate="animate"
           transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
           whileHover={{ scale: 1.02 }}
-          className="mt-12 inline-flex"
+          className="mt-8 inline-flex"
         >
           <Link
             href="/demos"
