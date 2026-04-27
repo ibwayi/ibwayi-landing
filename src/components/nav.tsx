@@ -47,7 +47,7 @@ export function Nav() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Fiverr profile (opens in new tab)"
-            className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="inline-flex cursor-pointer items-center rounded-full px-3 py-1 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             <span>Fiverr</span>
             <ArrowUpRight aria-hidden="true" className="ml-1 h-3.5 w-3.5" />
