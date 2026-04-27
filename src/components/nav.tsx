@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -92,6 +92,7 @@ export function Nav() {
   const pathname = usePathname();
   const shouldReduce = useReducedMotion();
   const isMobile = useMediaQuery("(max-width: 639px)");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const { scrollY } = useScroll();
 
@@ -120,14 +121,19 @@ export function Nav() {
   return (
     <header className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4 sm:top-6 sm:px-6">
       <motion.nav
+        animate={{
+          opacity: mobileMenuOpen ? 0 : 1,
+        }}
+        transition={{ opacity: { duration: 0.2 } }}
         style={{
           paddingTop: fixedPill ? 6 : navPaddingYMV,
           paddingBottom: fixedPill ? 6 : navPaddingYMV,
           paddingLeft: fixedPill ? 6 : navPaddingXMV,
           paddingRight: fixedPill ? 6 : navPaddingXMV,
           gap: fixedPill ? 2 : navGapMV,
+          pointerEvents: mobileMenuOpen ? "none" : "auto",
         }}
-        className="pointer-events-auto flex items-center rounded-full border border-border bg-background/80 shadow-lg shadow-black/20 backdrop-blur-md"
+        className="flex items-center rounded-full border border-border bg-background/80 shadow-lg shadow-black/20 backdrop-blur-md"
       >
         <Link
           href="/"
@@ -190,7 +196,7 @@ export function Nav() {
 
         {/* Mobile-only burger menu */}
         <div className="sm:hidden">
-          <MobileMenu />
+          <MobileMenu open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} />
         </div>
       </motion.nav>
     </header>

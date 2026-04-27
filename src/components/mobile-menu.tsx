@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowUpRight, Menu } from "lucide-react";
@@ -13,19 +13,27 @@ import {
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
+interface MobileMenuProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
 /**
  * Mobile-only nav drawer. Trigger sits in the pill (next to the
  * ThemeToggle); Sheet content is portaled to body via shadcn's wrapper.
+ *
+ * Sheet open-state is controlled from outside (via Nav) so the parent
+ * can react to it — currently used to fade out the floating pill while
+ * the menu is open.
  *
  * The Sheet primitive is built on Base UI dialog (not Radix), so it
  * already has tap-outside-to-close, Escape-to-close, focus trap, and
  * prefers-reduced-motion handling baked in.
  */
-export function MobileMenu() {
-  const [open, setOpen] = useState(false);
+export function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
   const pathname = usePathname();
 
-  const close = () => setOpen(false);
+  const close = () => onOpenChange(false);
 
   function isActive(href: string): boolean {
     if (!pathname) return false;
@@ -35,7 +43,7 @@ export function MobileMenu() {
   }
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetTrigger
         aria-label="Open menu"
         className="inline-flex cursor-pointer items-center justify-center rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
