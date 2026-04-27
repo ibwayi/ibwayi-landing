@@ -37,11 +37,10 @@ export function Footer() {
   return (
     <footer className="mt-24 border-t border-border/60">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-12 md:grid-cols-3 md:gap-6">
-        {/* Left — Wordmark + tagline + copyright */}
-        <div>
-          <p className="text-base font-bold tracking-tight text-foreground">ibwayi</p>
-          <p className="mt-1 text-sm text-muted-foreground">Custom AI Solutions</p>
-          <p className="mt-4 text-xs text-muted-foreground">© {year}</p>
+        {/* Left — Compliance tagline + copyright (baseline-aligned to other cols) */}
+        <div className="flex flex-col gap-1 md:justify-end">
+          <p className="text-xs text-muted-foreground">EU-Based · GDPR-Compliant</p>
+          <p className="text-xs text-muted-foreground">© {year}</p>
         </div>
 
         {/* Middle — Powered-By logos */}
