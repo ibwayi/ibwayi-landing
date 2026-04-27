@@ -1,7 +1,6 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { MessageSquare, Rocket, Workflow } from "lucide-react";
 import { ServiceCard } from "@/components/sections/service-card";
 import {
   reducedReveal,
@@ -24,7 +23,6 @@ const services = [
       "Trained on your business data. Embedded on your site, in WhatsApp, or wherever your customers are. Handles FAQs, qualifies leads, books appointments.",
     tags: ["OpenAI", "Claude", "Gemini"],
     href: "/demos/chatbot",
-    icon: MessageSquare,
   },
   {
     slug: "automation",
@@ -35,7 +33,6 @@ const services = [
       "Webhooks in, smart actions out. Connect tools, process documents, summarize content, route requests — all without you in the loop.",
     tags: ["n8n", "Zapier", "Webhooks"],
     href: "/demos/automation",
-    icon: Workflow,
   },
   {
     slug: "mvp",
@@ -46,7 +43,6 @@ const services = [
       "Auth, database, dashboard, and a real AI feature at the core. Ideas to launched product in days, not months.",
     tags: ["Next.js", "Supabase", "Stripe"],
     href: "/demos/mvp",
-    icon: Rocket,
   },
 ] as const;
 
@@ -79,12 +75,12 @@ export function Services() {
         {services.map((service) => (
           <ServiceCard
             key={service.slug}
+            slug={service.slug}
             eyebrow={service.eyebrow}
             sublabel={service.sublabel}
             headline={service.headline}
             description={service.description}
             href={service.href}
-            icon={service.icon}
             tags={service.tags}
           />
         ))}
