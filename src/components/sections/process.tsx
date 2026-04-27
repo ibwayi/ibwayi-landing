@@ -8,6 +8,7 @@ import {
   useTransform,
 } from "motion/react";
 import { Code, FileText, Phone, Rocket, Sparkles } from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   reducedReveal,
   reducedStagger,
@@ -58,22 +59,31 @@ const STEPS: readonly Step[] = [
 ] as const;
 
 /**
- * "How I work" section — five vertical cards on a centerline.
+ * Zigzag path connecting 5 card anchors. Even-index cards (0, 2, 4) sit
+ * in the left grid column at viewBox x=350; odd-index (1, 3) at x=650.
+ * Y values evenly spaced so each card anchors at 10/30/50/70/90 % of
+ * the container height — close enough when card heights are similar.
  *
- * Layout is identical mobile/desktop: cards stack in a column inside a
- * max-w-3xl container, each card with a 48px icon-circle on the left
- * and title + description on the right. A 1px vertical line sits at
- * left-1/2 of the steps container. Cards are opaque and stack above
- * the line, so the line is only visible in the gaps between cards —
- * which is the desired effect (each gap reads as a connector).
+ * preserveAspectRatio="none" stretches X/Y independently with the
+ * container; vectorEffect="non-scaling-stroke" keeps the 2px stroke
+ * crisp at any aspect ratio.
+ */
+const ZIGZAG_PATH = "M 350 100 L 650 300 L 350 500 L 650 700 L 350 900";
+
+/**
+ * "How I work" section — five cards in a zigzag at desktop (≥lg),
+ * stacked vertically on mobile/tablet. Each card has a giant
+ * step-number watermark in the top-right corner at very low opacity
+ * (4% by default) for depth without decoration noise.
  *
- * On scroll, the violet line draws in via scaleY 0→1 driven by
- * useScroll on the steps container. With prefers-reduced-motion, the
- * violet line is fully drawn at first paint.
+ * Connecting line:
+ * - Desktop: SVG path that diagonals between alternating card columns,
+ *   pathLength animating 0→1 as the user scrolls.
+ * - Mobile: a plain vertical line at the left edge, scaleY 0→1.
  *
- * Replaces the snake-path + zigzag + background-shapes implementation
- * from the previous followup — that was visually noisy and the icon
- * positions never reliably matched the snake's anchor points.
+ * Replaces the previous vertical-cards-on-centerline iteration —
+ * cards-on-a-line read as too plain. Zigzag + watermark gives the
+ * section more weight without leaning on heavy decoration.
  */
 export function Process() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -90,7 +100,7 @@ export function Process() {
 
   return (
     <section className="relative py-20 md:py-28 lg:py-32">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <motion.div
           variants={containerVariant}
           initial="hidden"
@@ -119,25 +129,61 @@ export function Process() {
         </motion.div>
 
         <div ref={containerRef} className="relative">
-          {/* Permanent grey track at the centerline. */}
-          <div
-            aria-hidden
-            className="absolute top-0 bottom-0 left-1/2 w-px -translate-x-px bg-border"
-          />
+          {/* Desktop layout: 2-col zigzag grid + SVG zigzag path. */}
+          <div className="relative hidden lg:block">
+            <div className="grid grid-cols-2 gap-x-12 gap-y-20">
+              {STEPS.map((step, index) => (
+                <StepCard
+                  key={step.title}
+                  step={step}
+                  index={index}
+                  colStart={index % 2 === 0 ? 1 : 2}
+                />
+              ))}
+            </div>
 
-          {/* Animated violet progress line — scaleY 0→1 as the section
-              scrolls through the viewport. */}
-          <motion.div
-            aria-hidden
-            style={{ scaleY: shouldReduce ? 1 : lineProgress }}
-            className="absolute top-0 left-1/2 h-full w-px origin-top -translate-x-px bg-accent-brand"
-          />
+            <svg
+              aria-hidden
+              className="pointer-events-none absolute inset-0 h-full w-full"
+              viewBox="0 0 1000 1000"
+              preserveAspectRatio="none"
+            >
+              <path
+                d={ZIGZAG_PATH}
+                stroke="currentColor"
+                strokeWidth="2"
+                fill="none"
+                vectorEffect="non-scaling-stroke"
+                className="text-border"
+              />
+              <motion.path
+                d={ZIGZAG_PATH}
+                stroke="currentColor"
+                strokeWidth="2"
+                fill="none"
+                vectorEffect="non-scaling-stroke"
+                style={{ pathLength: shouldReduce ? 1 : lineProgress }}
+                className="text-accent-brand"
+              />
+            </svg>
+          </div>
 
-          {/* Cards — relative so they stack above the line. */}
-          <div className="relative space-y-6 md:space-y-8">
-            {STEPS.map((step) => (
-              <StepCard key={step.title} step={step} />
-            ))}
+          {/* Mobile/tablet layout: stacked cards + vertical line. */}
+          <div className="relative lg:hidden">
+            <div
+              aria-hidden
+              className="absolute top-0 bottom-0 left-4 w-px bg-border"
+            />
+            <motion.div
+              aria-hidden
+              style={{ scaleY: shouldReduce ? 1 : lineProgress }}
+              className="absolute top-0 left-4 h-full w-px origin-top bg-accent-brand"
+            />
+            <div className="space-y-8 pl-12">
+              {STEPS.map((step, index) => (
+                <StepCard key={step.title} step={step} index={index} />
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -145,10 +191,16 @@ export function Process() {
   );
 }
 
-function StepCard({ step }: { step: Step }) {
+interface StepCardProps {
+  step: Step;
+  index: number;
+  /** Desktop grid placement; ignored at <lg. */
+  colStart?: 1 | 2;
+}
+
+function StepCard({ step, index, colStart }: StepCardProps) {
   const shouldReduce = useReducedMotion();
   const variants = shouldReduce ? reducedReveal : reveal;
-  const Icon = step.icon;
 
   return (
     <motion.div
@@ -157,23 +209,43 @@ function StepCard({ step }: { step: Step }) {
       whileInView="visible"
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.7, delay: 0.1 }}
-      className="rounded-2xl border border-border bg-card p-6 shadow-sm md:p-8"
+      className={cn(
+        "relative",
+        colStart === 1 && "lg:col-start-1",
+        colStart === 2 && "lg:col-start-2",
+      )}
     >
-      <div className="flex items-start gap-4 md:gap-6">
-        <div className="shrink-0">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-border bg-background">
-            <Icon className="h-5 w-5 text-foreground" />
-          </div>
-        </div>
-        <div className="flex-1 pt-1">
-          <h3 className="font-display text-xl font-semibold tracking-tight text-foreground md:text-2xl">
-            {step.title}
-          </h3>
-          <p className="mt-2 text-base leading-relaxed text-muted-foreground">
-            {step.description}
-          </p>
-        </div>
-      </div>
+      <StepCardBody step={step} index={index} />
     </motion.div>
+  );
+}
+
+function StepCardBody({ step, index }: { step: Step; index: number }) {
+  const Icon = step.icon;
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-lg md:p-8">
+      {/* Watermark step-number — very-low-opacity Geist-bold glyph in
+          the top-right. overflow-hidden on the card clips its edges. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-4 -right-4 select-none"
+      >
+        <span className="font-display text-[140px] font-bold leading-none tracking-tight text-foreground/[0.04] md:text-[180px]">
+          {String(index + 1).padStart(2, "0")}
+        </span>
+      </div>
+
+      <div className="relative z-10">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full border-2 border-border bg-background">
+          <Icon className="h-5 w-5 text-foreground" />
+        </div>
+        <h3 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+          {step.title}
+        </h3>
+        <p className="mt-3 text-base leading-relaxed text-muted-foreground">
+          {step.description}
+        </p>
+      </div>
+    </div>
   );
 }
