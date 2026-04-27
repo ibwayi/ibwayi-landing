@@ -131,8 +131,36 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
+    position: relative;
   }
   html {
     @apply font-sans;
   }
+}
+
+/*
+ * Diagonal stripe pattern — dark-mode only, fixed-position overlay so it
+ * scrolls with the viewport instead of repeating per-section. Very dezent
+ * (opacity ~0.06) and pointer-events:none so it never interferes with clicks.
+ * 7.3d will refine this if needed.
+ */
+.dark body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0,
+    transparent 22px,
+    rgba(168, 85, 247, 0.06) 22px,
+    rgba(168, 85, 247, 0.06) 23px
+  );
+}
+
+/* Make sure all content sits above the stripe overlay. */
+body > * {
+  position: relative;
+  z-index: 1;
 }

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { Nav } from "@/components/nav";
+import { Footer } from "@/components/footer";
 import "./globals.css";
 
 const inter = Inter({
@@ -28,7 +30,16 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          {children}
+          <Nav />
+          {/*
+           * Footer lives INSIDE <main> on purpose. If it sat outside, short
+           * pages would let the body's flex column push it to the viewport
+           * bottom — causing layout shift between long and short routes.
+           */}
+          <main className="flex flex-1 flex-col pt-24">
+            {children}
+            <Footer />
+          </main>
         </ThemeProvider>
       </body>
     </html>
