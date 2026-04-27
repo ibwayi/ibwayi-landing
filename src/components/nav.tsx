@@ -11,28 +11,34 @@ import {
 } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
 import { Avatar } from "@/components/avatar";
+import { MobileMenu } from "@/components/mobile-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { cn } from "@/lib/utils";
 
 /**
- * Custom floating-pill nav with scroll-driven avatar shrink + wordmark fade.
+ * Floating-pill nav. Two layouts share the same pill:
  *
- * - At scrollY = 0 (desktop): big 56px avatar + "Ibwayi" wordmark visible.
- * - After ~100px scroll: avatar shrinks to 32px, wordmark fades + width
- *   collapses to 0, pill padding/gap tighten. End state matches the previous
- *   compact pill from 7.4a-2.
- * - Mobile (<sm): avatar fixed at 32px, wordmark hidden via CSS so SSR is
- *   stable. Scroll transforms still run but visually no avatar size change.
- * - prefers-reduced-motion: snap to compact state, no transforms.
+ * - Desktop (≥ sm): scroll-driven transformation. At scrollY=0, big
+ *   56px avatar + "Ibwayi" wordmark + Home/Demos/About + ThemeToggle +
+ *   Fiverr. After ~100px scroll, avatar shrinks to 32, wordmark fades,
+ *   pill padding+gap tighten.
+ * - Mobile (< sm): vereinfachte Pill — Avatar(32) + ThemeToggle +
+ *   Burger. Tap on burger opens a slide-in Sheet from the right with
+ *   Home / Demos / About / Fiverr. Pill padding/gap pinned to compact
+ *   end-state so the pill fits 375px viewport.
  *
- * Design rules carried from 7.4a-2:
- * - Outer <header> pointer-events-none, inner pill pointer-events-auto.
- * - Hit-box of nav items (px+py) stays constant — only the *wrapper* padding
- *   and gap animate. This is why scroll never shifts where you need to click.
- * - z-50 above stripe (z-0) and main (z-1).
- * - No backdrop-blur in animated frames (it's static on the pill, applied
- *   via Tailwind class — Motion doesn't touch it).
+ * Layout split is done via Tailwind responsive classes (`hidden sm:*`
+ * / `sm:hidden`), not via JS branching. The motion-driven inline styles
+ * apply to elements regardless of viewport — but those elements are
+ * either visible (desktop) or removed via `display: none` (mobile),
+ * so SSR is stable and no flash occurs on either side.
+ *
+ * Anti-flake guards:
+ * - Per-item hit-box (px-2.5 py-2 sm:px-4) is NOT animated. Only the
+ *   pill wrapper padding and gap animate (desktop only).
+ * - All transforms deterministic via scrollY/useTransform.
+ * - prefers-reduced-motion: snap to compact end-state, no transforms.
  */
 
 const TRANSITION_END = 100;
@@ -89,8 +95,6 @@ export function Nav() {
 
   const { scrollY } = useScroll();
 
-  // All raw scroll-driven values — components below pick which to use based
-  // on shouldReduce / isMobile.
   const avatarSizeMV = useTransform(scrollY, [0, TRANSITION_END], [56, 32]);
   const wordmarkOpacityMV = useTransform(
     scrollY,
@@ -100,26 +104,28 @@ export function Nav() {
   const wordmarkWidthMV = useTransform(
     scrollY,
     [0, TRANSITION_END * 0.7],
-    [88, 0], // approx Geist-bold "Ibwayi" + 12px breathing room
+    [88, 0],
   );
   const navPaddingYMV = useTransform(scrollY, [0, TRANSITION_END], [12, 6]);
   const navPaddingXMV = useTransform(scrollY, [0, TRANSITION_END], [16, 6]);
   const navGapMV = useTransform(scrollY, [0, TRANSITION_END], [12, 2]);
 
-  // Pin to the compact end-state when reduced-motion is on, or (for the
-  // avatar/wordmark) when we're on mobile.
+  // On mobile or with reduced-motion, snap everything to the compact
+  // end-state. Same numbers reduced-motion uses, so the design system
+  // stays consistent across both bypass paths.
   const fixedAvatar = shouldReduce || isMobile;
   const fixedWordmark = shouldReduce || isMobile;
+  const fixedPill = shouldReduce || isMobile;
 
   return (
     <header className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4 sm:top-6 sm:px-6">
       <motion.nav
         style={{
-          paddingTop: shouldReduce ? 6 : navPaddingYMV,
-          paddingBottom: shouldReduce ? 6 : navPaddingYMV,
-          paddingLeft: shouldReduce ? 6 : navPaddingXMV,
-          paddingRight: shouldReduce ? 6 : navPaddingXMV,
-          gap: shouldReduce ? 2 : navGapMV,
+          paddingTop: fixedPill ? 6 : navPaddingYMV,
+          paddingBottom: fixedPill ? 6 : navPaddingYMV,
+          paddingLeft: fixedPill ? 6 : navPaddingXMV,
+          paddingRight: fixedPill ? 6 : navPaddingXMV,
+          gap: fixedPill ? 2 : navGapMV,
         }}
         className="pointer-events-auto flex items-center rounded-full border border-border bg-background/80 shadow-lg shadow-black/20 backdrop-blur-md"
       >
@@ -138,10 +144,6 @@ export function Nav() {
             <Avatar size="lg" className="h-full w-full text-base" />
           </motion.div>
 
-          {/*
-           * Wordmark is hidden via CSS on mobile (`hidden sm:inline-flex`) so
-           * SSR is stable. Motion still drives opacity/width on desktop.
-           */}
           <motion.span
             aria-hidden={fixedWordmark}
             style={{
@@ -154,32 +156,42 @@ export function Nav() {
           </motion.span>
         </Link>
 
-        <div aria-hidden className="mx-0.5 h-5 w-px shrink-0 bg-border sm:mx-1" />
-
-        {ITEMS.map((item) => (
-          <NavItem
-            key={item.href}
-            href={item.href}
-            active={isActive(pathname, item.href)}
-          >
-            {item.label}
-          </NavItem>
-        ))}
-
-        <div aria-hidden className="mx-0.5 h-5 w-px shrink-0 bg-border sm:mx-1" />
+        {/* Desktop-only block: separators + nav items */}
+        <motion.div
+          className="hidden items-center sm:flex"
+          style={{ gap: shouldReduce ? 2 : navGapMV }}
+        >
+          <div aria-hidden className="mx-0.5 h-5 w-px shrink-0 bg-border sm:mx-1" />
+          {ITEMS.map((item) => (
+            <NavItem
+              key={item.href}
+              href={item.href}
+              active={isActive(pathname, item.href)}
+            >
+              {item.label}
+            </NavItem>
+          ))}
+          <div aria-hidden className="mx-0.5 h-5 w-px shrink-0 bg-border sm:mx-1" />
+        </motion.div>
 
         <ThemeToggle />
 
+        {/* Desktop-only Fiverr link */}
         <a
           href="https://fiverr.com/ibwayi"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Fiverr profile (opens in new tab)"
-          className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-full px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:px-4"
+          className="hidden shrink-0 cursor-pointer items-center gap-1 rounded-full px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:inline-flex sm:px-4"
         >
           <span>Fiverr</span>
           <ArrowUpRight aria-hidden="true" className="h-3.5 w-3.5" />
         </a>
+
+        {/* Mobile-only burger menu */}
+        <div className="sm:hidden">
+          <MobileMenu />
+        </div>
       </motion.nav>
     </header>
   );
