@@ -164,3 +164,20 @@ body > * {
   position: relative;
   z-index: 1;
 }
+
+/*
+ * Respect prefers-reduced-motion. CSS short-circuits all transitions and
+ * animations to ~0ms; components that drive animations from JS (Motion)
+ * additionally check useReducedMotion() to avoid setting `filter: blur`
+ * on elements at all.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

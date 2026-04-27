@@ -1,10 +1,14 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { MessageSquare, Rocket, Workflow } from "lucide-react";
 import { ServiceCard } from "@/components/sections/service-card";
-
-const EASE_OUT_QUINT = [0.16, 1, 0.3, 1] as const;
+import {
+  reducedReveal,
+  reducedStagger,
+  reveal,
+  revealStagger,
+} from "@/lib/animations";
 
 /**
  * Order is locked per DECISION #64: Chatbot → Automation → MVP.
@@ -46,18 +50,20 @@ const services = [
   },
 ] as const;
 
-const CARD_DELAYS = [0.1, 0.25, 0.4] as const;
-
 export function Services() {
+  const shouldReduce = useReducedMotion();
+  const containerVariant = shouldReduce ? reducedStagger : revealStagger;
+  const childVariant = shouldReduce ? reducedReveal : reveal;
+
   return (
-    <section className="mx-auto w-full max-w-6xl px-6 pt-12 pb-20 sm:px-10 md:pt-16 md:pb-28">
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.15 }}
-        transition={{ duration: 0.7, ease: EASE_OUT_QUINT }}
-        className="mb-12 max-w-2xl"
-      >
+    <motion.section
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.15 }}
+      variants={containerVariant}
+      className="mx-auto w-full max-w-6xl px-6 pt-12 pb-20 sm:px-10 md:pt-16 md:pb-28"
+    >
+      <motion.div variants={childVariant} className="mb-12 max-w-2xl">
         <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
           What I Build
         </p>
@@ -70,7 +76,7 @@ export function Services() {
       </motion.div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
-        {services.map((service, idx) => (
+        {services.map((service) => (
           <ServiceCard
             key={service.slug}
             eyebrow={service.eyebrow}
@@ -80,10 +86,9 @@ export function Services() {
             href={service.href}
             icon={service.icon}
             tags={service.tags}
-            delay={CARD_DELAYS[idx]}
           />
         ))}
       </div>
-    </section>
+    </motion.section>
   );
 }
