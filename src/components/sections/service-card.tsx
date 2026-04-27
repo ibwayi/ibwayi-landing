@@ -5,35 +5,42 @@ import { motion } from "motion/react";
 import { ArrowRight, type LucideIcon } from "lucide-react";
 
 interface ServiceCardProps {
-  label: string;
+  eyebrow: string;
+  sublabel: string;
   headline: string;
   description: string;
   href: string;
   icon: LucideIcon;
+  tags: readonly string[];
   delay?: number;
 }
 
+const EASE_OUT_QUINT = [0.16, 1, 0.3, 1] as const;
+
 /**
- * Single service card. Whole card is one Link so the hit area covers
- * everything; hover state lifts + shifts border + glow + nudges the
- * "View Demo" arrow. Entry animation lives on the motion.div wrapper —
- * Tailwind owns the hover transitions so we don't fight Framer Motion
- * over transform values.
+ * Single service card. Whole card is one Link (full hit area). Description
+ * gets `flex-grow` so the tag row + footer sit at a consistent vertical
+ * position across all cards regardless of description length.
+ *
+ * Hover handled in Tailwind, entry handled in Motion — keeps the two
+ * animation systems off the same `transform` channel.
  */
 export function ServiceCard({
-  label,
+  eyebrow,
+  sublabel,
   headline,
   description,
   href,
   icon: Icon,
+  tags,
   delay = 0,
 }: ServiceCardProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.5, delay, ease: "easeOut" }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{ duration: 0.7, delay, ease: EASE_OUT_QUINT }}
       className="h-full"
     >
       <Link
@@ -45,16 +52,28 @@ export function ServiceCard({
         </div>
 
         <p className="mt-6 text-xs font-medium uppercase tracking-widest text-muted-foreground">
-          {label}
+          {eyebrow}
         </p>
+        <p className="mt-1 text-sm text-muted-foreground">{sublabel}</p>
         <h3 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
           {headline}
         </h3>
-        <p className="mt-3 text-base leading-relaxed text-muted-foreground">
+        <p className="mt-3 grow text-base leading-relaxed text-muted-foreground">
           {description}
         </p>
 
-        <div className="mt-auto flex items-center justify-end gap-1.5 pt-8 text-sm font-medium text-muted-foreground transition-colors group-hover:text-primary">
+        <div className="mt-6 flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <span
+              key={tag}
+              className="rounded-md border border-border px-2 py-0.5 text-xs text-muted-foreground"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+
+        <div className="mt-6 flex items-center justify-end gap-1.5 text-sm font-medium text-muted-foreground transition-colors group-hover:text-primary">
           <span>View Demo</span>
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
         </div>

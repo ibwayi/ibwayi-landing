@@ -18,7 +18,7 @@ const fadeUp = {
  */
 export function Hero() {
   return (
-    <section className="w-full px-6 py-24 sm:px-10 md:py-32 lg:py-40">
+    <section className="w-full px-6 pt-24 pb-12 sm:px-10 md:pt-32 md:pb-16 lg:pt-40">
       <div className="mx-auto flex max-w-5xl flex-col items-center text-center">
         <motion.h1
           variants={fadeUp}
