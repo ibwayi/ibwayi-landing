@@ -1,25 +1,47 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "motion/react";
 import { ArrowUpRight } from "lucide-react";
+import { Avatar } from "@/components/avatar";
+import { MobileMenu } from "@/components/mobile-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useMediaQuery } from "@/lib/use-media-query";
 import { cn } from "@/lib/utils";
 
 /**
- * Custom floating-pill nav. Replaces the Aceternity FloatingNavbar that we
- * used through 7.3a–7.4a — its useScroll-driven hide-on-scroll + opacity
- * animations were repeatedly causing desktop click-reliability issues
- * (cursor flicker, missed first click, nav vanishing on hash navigation).
+ * Floating-pill nav. Two layouts share the same pill:
  *
- * Design rules:
- * - No Framer Motion in the Nav. CSS transitions for hover only.
- * - Outer <header> is pointer-events-none so clicks outside the pill fall
- *   through to the page. Inner <nav> opts back in with pointer-events-auto.
- * - z-50 sits above the body::before stripe pattern (z-0) and the page
- *   content (z-1).
+ * - Desktop (≥ sm): scroll-driven transformation. At scrollY=0, big
+ *   56px avatar + "Ibwayi" wordmark + Home/Demos/About + ThemeToggle +
+ *   Fiverr. After ~100px scroll, avatar shrinks to 32, wordmark fades,
+ *   pill padding+gap tighten.
+ * - Mobile (< sm): vereinfachte Pill — Avatar(32) + ThemeToggle +
+ *   Burger. Tap on burger opens a slide-in Sheet from the right with
+ *   Home / Demos / About / Fiverr. Pill padding/gap pinned to compact
+ *   end-state so the pill fits 375px viewport.
+ *
+ * Layout split is done via Tailwind responsive classes (`hidden sm:*`
+ * / `sm:hidden`), not via JS branching. The motion-driven inline styles
+ * apply to elements regardless of viewport — but those elements are
+ * either visible (desktop) or removed via `display: none` (mobile),
+ * so SSR is stable and no flash occurs on either side.
+ *
+ * Anti-flake guards:
+ * - Per-item hit-box (px-2.5 py-2 sm:px-4) is NOT animated. Only the
+ *   pill wrapper padding and gap animate (desktop only).
+ * - All transforms deterministic via scrollY/useTransform.
+ * - prefers-reduced-motion: snap to compact end-state, no transforms.
  */
+
+const TRANSITION_END = 100;
 
 type NavItemDef = { href: string; label: string };
 
@@ -33,7 +55,6 @@ function isActive(pathname: string | null, href: string): boolean {
   if (!pathname) return false;
   if (href === "/") return pathname === "/";
   if (href === "/demos") return pathname === "/demos" || pathname.startsWith("/demos/");
-  // Hash anchors (e.g. /#about) live on Home — never match as the active route.
   return false;
 }
 
@@ -69,44 +90,115 @@ function NavItem({
 
 export function Nav() {
   const pathname = usePathname();
+  const shouldReduce = useReducedMotion();
+  const isMobile = useMediaQuery("(max-width: 639px)");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const { scrollY } = useScroll();
+
+  const avatarSizeMV = useTransform(scrollY, [0, TRANSITION_END], [56, 32]);
+  const wordmarkOpacityMV = useTransform(
+    scrollY,
+    [0, TRANSITION_END * 0.5],
+    [1, 0],
+  );
+  const wordmarkWidthMV = useTransform(
+    scrollY,
+    [0, TRANSITION_END * 0.7],
+    [88, 0],
+  );
+  const navPaddingYMV = useTransform(scrollY, [0, TRANSITION_END], [12, 6]);
+  const navPaddingXMV = useTransform(scrollY, [0, TRANSITION_END], [16, 6]);
+  const navGapMV = useTransform(scrollY, [0, TRANSITION_END], [12, 2]);
+
+  // On mobile or with reduced-motion, snap everything to the compact
+  // end-state. Same numbers reduced-motion uses, so the design system
+  // stays consistent across both bypass paths.
+  const fixedAvatar = shouldReduce || isMobile;
+  const fixedWordmark = shouldReduce || isMobile;
+  const fixedPill = shouldReduce || isMobile;
 
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4 sm:top-6">
-      <nav className="pointer-events-auto flex items-center gap-0.5 rounded-full border border-border bg-background/80 px-1.5 py-2 shadow-lg shadow-black/20 backdrop-blur-md sm:gap-1 sm:px-2">
+    <header className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4 sm:top-6 sm:px-6">
+      <motion.nav
+        animate={{
+          opacity: mobileMenuOpen ? 0 : 1,
+        }}
+        transition={{ opacity: { duration: 0.2 } }}
+        style={{
+          paddingTop: fixedPill ? 6 : navPaddingYMV,
+          paddingBottom: fixedPill ? 6 : navPaddingYMV,
+          paddingLeft: fixedPill ? 6 : navPaddingXMV,
+          paddingRight: fixedPill ? 6 : navPaddingXMV,
+          gap: fixedPill ? 2 : navGapMV,
+          pointerEvents: mobileMenuOpen ? "none" : "auto",
+        }}
+        className="flex items-center rounded-full border border-border bg-background/80 shadow-lg shadow-black/20 backdrop-blur-md"
+      >
         <Link
           href="/"
-          className="cursor-pointer rounded-full px-2.5 py-2 text-sm font-bold tracking-tight text-foreground transition-colors hover:text-accent-brand sm:px-3"
+          className="flex cursor-pointer items-center gap-2 rounded-full px-1 py-0.5 transition-colors hover:bg-muted"
+          aria-label="Home — Ibwayi"
         >
-          Ibwayi
+          <motion.div
+            style={{
+              width: fixedAvatar ? 32 : avatarSizeMV,
+              height: fixedAvatar ? 32 : avatarSizeMV,
+            }}
+            className="shrink-0"
+          >
+            <Avatar size="lg" className="h-full w-full text-base" />
+          </motion.div>
+
+          <motion.span
+            aria-hidden={fixedWordmark}
+            style={{
+              opacity: fixedWordmark ? 0 : wordmarkOpacityMV,
+              width: fixedWordmark ? 0 : wordmarkWidthMV,
+            }}
+            className="hidden overflow-hidden whitespace-nowrap font-display text-base font-bold tracking-tight text-foreground sm:inline-flex"
+          >
+            Ibwayi
+          </motion.span>
         </Link>
 
-        <div aria-hidden className="mx-0.5 h-5 w-px bg-border sm:mx-1" />
-
-        {ITEMS.map((item) => (
-          <NavItem
-            key={item.href}
-            href={item.href}
-            active={isActive(pathname, item.href)}
-          >
-            {item.label}
-          </NavItem>
-        ))}
-
-        <div aria-hidden className="mx-0.5 h-5 w-px bg-border sm:mx-1" />
+        {/* Desktop-only block: separators + nav items */}
+        <motion.div
+          className="hidden items-center sm:flex"
+          style={{ gap: shouldReduce ? 2 : navGapMV }}
+        >
+          <div aria-hidden className="mx-0.5 h-5 w-px shrink-0 bg-border sm:mx-1" />
+          {ITEMS.map((item) => (
+            <NavItem
+              key={item.href}
+              href={item.href}
+              active={isActive(pathname, item.href)}
+            >
+              {item.label}
+            </NavItem>
+          ))}
+          <div aria-hidden className="mx-0.5 h-5 w-px shrink-0 bg-border sm:mx-1" />
+        </motion.div>
 
         <ThemeToggle />
 
+        {/* Desktop-only Fiverr link */}
         <a
           href="https://fiverr.com/ibwayi"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Fiverr profile (opens in new tab)"
-          className="inline-flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:px-4"
+          className="hidden shrink-0 cursor-pointer items-center gap-1 rounded-full px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:inline-flex sm:px-4"
         >
           <span>Fiverr</span>
           <ArrowUpRight aria-hidden="true" className="h-3.5 w-3.5" />
         </a>
-      </nav>
+
+        {/* Mobile-only burger menu */}
+        <div className="sm:hidden">
+          <MobileMenu open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} />
+        </div>
+      </motion.nav>
     </header>
   );
 }
