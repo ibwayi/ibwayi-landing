@@ -35,7 +35,7 @@ export function Hero() {
       className="w-full px-6 pt-24 pb-12 sm:px-10 md:pt-32 md:pb-16 lg:pt-40"
     >
       <div className="mx-auto flex max-w-5xl flex-col items-center text-center">
-        <h1 className="text-4xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+        <h1 className="font-display text-4xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
           <motion.span variants={childVariant} className="block">
             Custom AI.
           </motion.span>

@@ -37,7 +37,7 @@ export function Nav() {
 
   return (
     <FloatingNav
-      logo="ibwayi"
+      logo="Ibwayi"
       navItems={items}
       cta={
         <div className="flex items-center gap-1">

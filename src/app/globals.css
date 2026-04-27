@@ -7,7 +7,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-accent-brand: var(--accent-brand);
   --font-sans: var(--font-inter);
+  --font-display: var(--font-geist-sans);
   --font-mono: var(--font-inter);
   --font-heading: var(--font-inter);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -62,18 +64,22 @@
   --card-foreground: #0a0a0a;
   --popover: #ffffff;
   --popover-foreground: #0a0a0a;
-  --primary: #a855f7;
-  --primary-foreground: #ffffff;
+  /* Primary CTAs invert in V2: black-on-white in light, white-on-black in dark.
+     Violet now lives in --accent-brand for active states, hover glows, highlights. */
+  --primary: #0a0a0a;
+  --primary-foreground: #fafafa;
   --secondary: #f4f4f5;
   --secondary-foreground: #0a0a0a;
   --muted: #f4f4f5;
   --muted-foreground: #71717a;
   --accent: #a855f7;
   --accent-foreground: #ffffff;
+  --accent-brand: #a855f7;
+  --accent-brand-glow: rgb(168 85 247 / 0.35);
   --destructive: oklch(0.577 0.245 27.325);
   --border: #e4e4e7;
   --input: #e4e4e7;
-  --ring: #a855f7;
+  --ring: var(--accent-brand);
   --chart-1: #a855f7;
   --chart-2: #c084fc;
   --chart-3: #d8b4fe;
@@ -98,18 +104,20 @@
   --card-foreground: #fafafa;
   --popover: #0f0f0f;
   --popover-foreground: #fafafa;
-  --primary: #a855f7;
-  --primary-foreground: #ffffff;
+  --primary: #fafafa;
+  --primary-foreground: #0a0a0a;
   --secondary: #18181b;
   --secondary-foreground: #fafafa;
   --muted: #18181b;
   --muted-foreground: #a1a1aa;
   --accent: #a855f7;
   --accent-foreground: #ffffff;
+  --accent-brand: #a855f7;
+  --accent-brand-glow: rgb(168 85 247 / 0.35);
   --destructive: oklch(0.704 0.191 22.216);
   --border: #27272a;
   --input: #27272a;
-  --ring: #a855f7;
+  --ring: var(--accent-brand);
   --chart-1: #a855f7;
   --chart-2: #c084fc;
   --chart-3: #d8b4fe;

@@ -67,7 +67,7 @@ export function Services() {
         <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
           What I Build
         </p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+        <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-foreground md:text-4xl">
           Three services. One developer.
         </h2>
         <p className="mt-4 max-w-xl text-base text-muted-foreground">
