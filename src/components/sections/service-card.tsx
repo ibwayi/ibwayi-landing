@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { ArrowRight, type LucideIcon } from "lucide-react";
+import { reducedReveal, reveal } from "@/lib/animations";
 
 interface ServiceCardProps {
   eyebrow: string;
@@ -12,18 +13,14 @@ interface ServiceCardProps {
   href: string;
   icon: LucideIcon;
   tags: readonly string[];
-  delay?: number;
 }
 
-const EASE_OUT_QUINT = [0.16, 1, 0.3, 1] as const;
-
 /**
- * Single service card. Whole card is one Link (full hit area). Description
- * gets `flex-grow` so the tag row + footer sit at a consistent vertical
- * position across all cards regardless of description length.
+ * Single service card. Whole card is one Link (full hit area).
  *
- * Hover handled in Tailwind, entry handled in Motion — keeps the two
- * animation systems off the same `transform` channel.
+ * Reveal animation comes from the parent Services section's stagger —
+ * this card just declares `variants={reveal}` and inherits the trigger.
+ * Hover is Tailwind-driven so it doesn't fight the reveal transform.
  */
 export function ServiceCard({
   eyebrow,
@@ -33,16 +30,12 @@ export function ServiceCard({
   href,
   icon: Icon,
   tags,
-  delay = 0,
 }: ServiceCardProps) {
+  const shouldReduce = useReducedMotion();
+  const variants = shouldReduce ? reducedReveal : reveal;
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: 0.7, delay, ease: EASE_OUT_QUINT }}
-      className="h-full"
-    >
+    <motion.div variants={variants} className="h-full">
       <Link
         href={href}
         className="group flex h-full flex-col rounded-2xl border border-border bg-card p-8 transition-all duration-300 ease-out hover:scale-[1.02] hover:border-primary/30 hover:shadow-[0_0_50px_-15px_rgba(168,85,247,0.35)] md:p-10"

@@ -1,60 +1,65 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-const fadeUp = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-};
+import {
+  reducedReveal,
+  reducedStagger,
+  reveal,
+  revealStagger,
+} from "@/lib/animations";
 
 /**
  * Landing-page hero. Three-line tricolon headline + supporting subline +
  * single primary CTA. Sized via vertical padding (not min-h) so the
- * section hands off naturally to whatever follows (Service-Cards in 7.3c).
+ * section hands off naturally to the Services section below.
+ *
+ * Animation: parent runs the stagger, every child uses the same `reveal`
+ * variant. Each tricolon line is its own motion.span so they animate
+ * line-by-line (chronark pattern). Falls back to a plain opacity fade
+ * when prefers-reduced-motion is set.
  */
 export function Hero() {
+  const shouldReduce = useReducedMotion();
+  const childVariant = shouldReduce ? reducedReveal : reveal;
+  const containerVariant = shouldReduce ? reducedStagger : revealStagger;
+
   return (
-    <section className="w-full px-6 pt-24 pb-12 sm:px-10 md:pt-32 md:pb-16 lg:pt-40">
+    <motion.section
+      initial="hidden"
+      animate="visible"
+      variants={containerVariant}
+      className="w-full px-6 pt-24 pb-12 sm:px-10 md:pt-32 md:pb-16 lg:pt-40"
+    >
       <div className="mx-auto flex max-w-5xl flex-col items-center text-center">
-        <motion.h1
-          variants={fadeUp}
-          initial="initial"
-          animate="animate"
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-4xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl"
-        >
-          <span className="block">Custom AI.</span>
-          <span className="block">Done right.</span>
-          <span className="block">Shipped fast.</span>
-        </motion.h1>
+        <h1 className="text-4xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+          <motion.span variants={childVariant} className="block">
+            Custom AI.
+          </motion.span>
+          <motion.span variants={childVariant} className="block">
+            Done right.
+          </motion.span>
+          <motion.span variants={childVariant} className="block">
+            Shipped fast.
+          </motion.span>
+        </h1>
 
         <motion.p
-          variants={fadeUp}
-          initial="initial"
-          animate="animate"
-          transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
+          variants={childVariant}
           className="mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl"
         >
           Chatbots, automations, and MVP web apps. From concept to launch.
         </motion.p>
 
-        <motion.div
-          variants={fadeUp}
-          initial="initial"
-          animate="animate"
-          transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-          whileHover={{ scale: 1.02 }}
-          className="mt-8 inline-flex"
-        >
+        <motion.div variants={childVariant} className="mt-8 inline-flex">
           <Link
             href="/demos"
             className={cn(
               buttonVariants({ variant: "default", size: "lg" }),
-              "h-12 gap-2 px-6 text-base",
+              "h-12 gap-2 px-6 text-base transition-transform hover:scale-[1.02]",
             )}
           >
             View Demos
@@ -62,6 +67,6 @@ export function Hero() {
           </Link>
         </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 }

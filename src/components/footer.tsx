@@ -1,5 +1,14 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
+import {
+  reducedReveal,
+  reducedStagger,
+  revealSubtle,
+  revealSubtleStagger,
+} from "@/lib/animations";
 
 /**
  * Site footer — three columns on desktop, stacked on mobile.
@@ -7,6 +16,10 @@ import { ArrowUpRight } from "lucide-react";
  * Brand logos inline as monochrome SVGs (paths from simpleicons.org, CC0).
  * `currentColor` lets them inherit the surrounding text color, so they tone
  * down with `text-muted-foreground` and pick up `text-foreground` on hover.
+ *
+ * Animation: subtle blur+fade+slide stagger when the footer enters view.
+ * Less aggressive than the Hero/Services reveal — the footer is supportive
+ * content, not a feature surface.
  */
 
 const POWERED_BY: { name: string; svgPath: string; viewBox?: string }[] = [
@@ -33,18 +46,30 @@ const POWERED_BY: { name: string; svgPath: string; viewBox?: string }[] = [
 
 export function Footer() {
   const year = new Date().getFullYear();
+  const shouldReduce = useReducedMotion();
+  const containerVariant = shouldReduce ? reducedStagger : revealSubtleStagger;
+  const childVariant = shouldReduce ? reducedReveal : revealSubtle;
 
   return (
-    <footer className="mt-24 border-t border-border/60">
+    <motion.footer
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+      variants={containerVariant}
+      className="mt-24 border-t border-border/60"
+    >
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-12 md:grid-cols-3 md:gap-6">
         {/* Left — Compliance tagline + copyright (baseline-aligned to other cols) */}
-        <div className="flex flex-col gap-1 md:justify-end">
+        <motion.div
+          variants={childVariant}
+          className="flex flex-col gap-1 md:justify-end"
+        >
           <p className="text-xs text-muted-foreground">EU-Based · GDPR-Compliant</p>
           <p className="text-xs text-muted-foreground">© {year}</p>
-        </div>
+        </motion.div>
 
         {/* Middle — Powered-By logos */}
-        <div className="md:text-center">
+        <motion.div variants={childVariant} className="md:text-center">
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             Powered by
           </p>
@@ -67,10 +92,10 @@ export function Footer() {
               </li>
             ))}
           </ul>
-        </div>
+        </motion.div>
 
         {/* Right — Mini-nav */}
-        <nav className="md:text-right">
+        <motion.nav variants={childVariant} className="md:text-right">
           <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm md:justify-end">
             <li>
               <Link
@@ -109,8 +134,8 @@ export function Footer() {
               </a>
             </li>
           </ul>
-        </nav>
+        </motion.nav>
       </div>
-    </footer>
+    </motion.footer>
   );
 }
