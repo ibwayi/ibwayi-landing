@@ -1,4 +1,4 @@
-# CLAUDE.md — ibwayi-landing
+# CLAUDE.md — Ibwayi Landing
 
 Working directory for Claude Code on the ibwayi.com landing page repo.
 

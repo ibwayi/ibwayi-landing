@@ -38,9 +38,9 @@ export function ServiceCard({
     <motion.div variants={variants} className="h-full">
       <Link
         href={href}
-        className="group flex h-full flex-col rounded-2xl border border-border bg-card p-8 transition-all duration-300 ease-out hover:scale-[1.02] hover:border-primary/30 hover:shadow-[0_0_50px_-15px_rgba(168,85,247,0.35)] md:p-10"
+        className="group flex h-full flex-col rounded-2xl border border-border bg-card p-8 transition-all duration-300 ease-out hover:scale-[1.02] hover:border-accent-brand/30 hover:shadow-[0_0_50px_-15px_var(--accent-brand-glow)] md:p-10"
       >
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all duration-300 group-hover:scale-105 group-hover:bg-primary/20">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-brand/10 text-accent-brand transition-all duration-300 group-hover:scale-105 group-hover:bg-accent-brand/20">
           <Icon className="h-6 w-6" />
         </div>
 
@@ -48,7 +48,7 @@ export function ServiceCard({
           {eyebrow}
         </p>
         <p className="mt-1 text-sm text-muted-foreground">{sublabel}</p>
-        <h3 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+        <h3 className="mt-2 font-display text-2xl font-semibold tracking-tight text-foreground">
           {headline}
         </h3>
         <p className="mt-3 grow text-base leading-relaxed text-muted-foreground">
@@ -66,7 +66,7 @@ export function ServiceCard({
           ))}
         </div>
 
-        <div className="mt-6 flex items-center justify-end gap-1.5 text-sm font-medium text-muted-foreground transition-colors group-hover:text-primary">
+        <div className="mt-6 flex items-center justify-end gap-1.5 text-sm font-medium text-muted-foreground transition-colors group-hover:text-accent-brand">
           <span>View Demo</span>
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
         </div>

@@ -94,7 +94,7 @@ export function FloatingNav({ navItems, logo, cta, className }: FloatingNavProps
             <>
               <Link
                 href="/"
-                className="rounded-full px-3 py-1 text-sm font-bold tracking-tight text-foreground transition-colors hover:text-primary"
+                className="cursor-pointer rounded-full px-3 py-1 text-sm font-bold tracking-tight text-foreground transition-colors hover:text-accent-brand"
               >
                 {logo}
               </Link>
@@ -105,9 +105,9 @@ export function FloatingNav({ navItems, logo, cta, className }: FloatingNavProps
           <div className="flex items-center gap-1">
             {navItems.map((item, idx) => {
               const baseClasses = cn(
-                "relative flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors sm:px-4 sm:py-1.5",
+                "relative flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors sm:px-4 sm:py-1.5",
                 item.active
-                  ? "text-primary"
+                  ? "text-accent-brand"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
               );
               const content = (
@@ -121,7 +121,7 @@ export function FloatingNav({ navItems, logo, cta, className }: FloatingNavProps
                   {item.active && (
                     <span
                       aria-hidden
-                      className="absolute inset-x-3 -bottom-px h-px bg-primary"
+                      className="absolute inset-x-3 -bottom-px h-px bg-accent-brand"
                     />
                   )}
                 </>

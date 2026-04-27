@@ -1,4 +1,4 @@
-# ibwayi-landing
+# Ibwayi Landing
 
 Landing page for **ibwayi.com** — AI Solutions Developer portfolio.
 
