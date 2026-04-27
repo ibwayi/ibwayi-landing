@@ -11,16 +11,20 @@ import {
   reveal,
   revealStagger,
 } from "@/lib/animations";
+import { HeroMockup } from "@/components/hero-mockup";
 
 /**
- * Landing-page hero. Three-line tricolon headline + supporting subline +
- * single primary CTA. Sized via vertical padding (not min-h) so the
- * section hands off naturally to the Services section below.
+ * Two-column hero. At ≥lg: tricolon left-aligned + mockup right. At <lg:
+ * stacked, text first then mockup. Section is sized via padding rather
+ * than min-height so the next section (Services) lands naturally below.
  *
- * Animation: parent runs the stagger, every child uses the same `reveal`
- * variant. Each tricolon line is its own motion.span so they animate
- * line-by-line (chronark pattern). Falls back to a plain opacity fade
- * when prefers-reduced-motion is set.
+ * Animation choreography (chronark-style, ~1.2s total):
+ * - Grid container drives a stagger across all four reveal children.
+ * - h1 (tricolon) reveals as one block — the line-by-line stagger that
+ *   was here before the redesign read as too busy next to the mockup.
+ * - The Live badge has its own delayed reveal in HeroMockup.
+ *
+ * Reduced-motion: snap to compact end state, no transforms.
  */
 export function Hero() {
   const shouldReduce = useReducedMotion();
@@ -28,45 +32,52 @@ export function Hero() {
   const containerVariant = shouldReduce ? reducedStagger : revealStagger;
 
   return (
-    <motion.section
-      initial="hidden"
-      animate="visible"
-      variants={containerVariant}
-      className="w-full px-6 pt-24 pb-12 sm:px-10 md:pt-32 md:pb-16 lg:pt-40"
-    >
-      <div className="mx-auto flex max-w-5xl flex-col items-center text-center">
-        <h1 className="font-display text-4xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-          <motion.span variants={childVariant} className="block">
-            Custom AI.
-          </motion.span>
-          <motion.span variants={childVariant} className="block">
-            Done right.
-          </motion.span>
-          <motion.span variants={childVariant} className="block">
-            Shipped fast.
-          </motion.span>
-        </h1>
-
-        <motion.p
-          variants={childVariant}
-          className="mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl"
+    <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 lg:pt-48 lg:pb-32">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <motion.div
+          variants={containerVariant}
+          initial="hidden"
+          animate="visible"
+          className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16"
         >
-          Chatbots, automations, and MVP web apps. From concept to launch.
-        </motion.p>
+          {/* Left column — tricolon + subline + CTA */}
+          <div className="flex flex-col items-start text-left">
+            <motion.h1
+              variants={childVariant}
+              className="font-display text-5xl font-bold leading-[1.05] tracking-tight text-foreground md:text-6xl lg:text-7xl"
+            >
+              <span className="block">Custom AI.</span>
+              <span className="block">Done right.</span>
+              <span className="block">Shipped fast.</span>
+            </motion.h1>
 
-        <motion.div variants={childVariant} className="mt-8 inline-flex">
-          <Link
-            href="/demos"
-            className={cn(
-              buttonVariants({ variant: "default", size: "lg" }),
-              "h-12 gap-2 px-6 text-base transition-transform hover:scale-[1.02]",
-            )}
-          >
-            View Demos
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+            <motion.p
+              variants={childVariant}
+              className="mt-6 max-w-xl text-lg text-muted-foreground md:text-xl"
+            >
+              Chatbots, automations, and MVP web apps. From concept to launch.
+            </motion.p>
+
+            <motion.div variants={childVariant} className="mt-8">
+              <Link
+                href="/demos"
+                className={cn(
+                  buttonVariants({ variant: "default", size: "lg" }),
+                  "h-12 gap-2 px-6 text-base transition-transform hover:scale-[1.02]",
+                )}
+              >
+                View Demos
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </motion.div>
+          </div>
+
+          {/* Right column — mockup */}
+          <motion.div variants={childVariant} className="relative">
+            <HeroMockup />
+          </motion.div>
         </motion.div>
       </div>
-    </motion.section>
+    </section>
   );
 }
