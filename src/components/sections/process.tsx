@@ -6,6 +6,7 @@ import {
   useReducedMotion,
   useScroll,
   useTransform,
+  type MotionValue,
 } from "motion/react";
 import { Code, FileText, Phone, Rocket, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -59,31 +60,36 @@ const STEPS: readonly Step[] = [
 ] as const;
 
 /**
- * Zigzag path connecting 5 card anchors. Even-index cards (0, 2, 4) sit
- * in the left grid column at viewBox x=350; odd-index (1, 3) at x=650.
- * Y values evenly spaced so each card anchors at 10/30/50/70/90 % of
- * the container height — close enough when card heights are similar.
+ * Single combined path with M jumps between subpaths so pathLength on
+ * the violet path animates a continuous "drawing" through all four
+ * connectors in order. viewBox is 100×100 (% units) and
+ * preserveAspectRatio="none" stretches with the wrapper.
  *
- * preserveAspectRatio="none" stretches X/Y independently with the
- * container; vectorEffect="non-scaling-stroke" keeps the 2px stroke
- * crisp at any aspect ratio.
+ * Connector segments:
+ *   1 → 2   horizontal across the col-gap at row-1 middle
+ *   2 → 3   right-angle: down out of card 2, left across, down into card 3
+ *   3 → 4   horizontal across the col-gap at row-2 middle
+ *   4 → 5   right-angle: down out of card 4, left to centerline, down into card 5
+ *
+ * Coordinate values are approximations of the card edges/middles in
+ * percent — close enough when card heights are similar; easy to tune
+ * if the live render shows the connectors landing off-edge.
  */
-const ZIGZAG_PATH = "M 350 100 L 650 300 L 350 500 L 650 700 L 350 900";
+const FLOW_PATH =
+  "M 48 15 H 52 M 76 30 V 40 H 48 V 50 M 48 50 H 52 M 76 65 V 72 H 50 V 80";
 
 /**
- * "How I work" section — five cards in a zigzag at desktop (≥lg),
- * stacked vertically on mobile/tablet. Each card has a giant
- * step-number watermark in the top-right corner at very low opacity
- * (4% by default) for depth without decoration noise.
+ * "How I work" section — 2×2 grid + a centered 5th highlight card.
  *
- * Connecting line:
- * - Desktop: SVG path that diagonals between alternating card columns,
- *   pathLength animating 0→1 as the user scrolls.
- * - Mobile: a plain vertical line at the left edge, scaleY 0→1.
+ * Step flow (Z): Card 1 (top-left) → Card 2 (top-right) → Card 3 (mid-left)
+ * → Card 4 (mid-right) → Card 5 (centered, highlighted, bigger). Right-
+ * angle SVG flow lines connect adjacent cards on desktop. Mobile/tablet
+ * stacks all five with a vertical line on the left.
  *
- * Replaces the previous vertical-cards-on-centerline iteration —
- * cards-on-a-line read as too plain. Zigzag + watermark gives the
- * section more weight without leaning on heavy decoration.
+ * Card 5 is the "success moment": accent-brand border, accent-brand icon,
+ * and a continuous animate-glow-pulse (3s violet bloom on top of the
+ * regular drop-shadow). Reduced-motion: pulse pinned to the mid-frame
+ * via the global @media rule clamping animation-duration.
  */
 export function Process() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -129,47 +135,29 @@ export function Process() {
         </motion.div>
 
         <div ref={containerRef} className="relative">
-          {/* Desktop layout: 2-col zigzag grid + SVG zigzag path. */}
+          {/* Desktop layout: 2×2 grid + centered card 5 + SVG flow lines. */}
           <div className="relative hidden lg:block">
-            <div className="grid grid-cols-2 gap-x-12 gap-y-20">
-              {STEPS.map((step, index) => (
-                <StepCard
-                  key={step.title}
-                  step={step}
-                  index={index}
-                  colStart={index % 2 === 0 ? 1 : 2}
-                />
-              ))}
+            <div className="mb-12 grid grid-cols-2 gap-x-12 gap-y-12">
+              <StepCard step={STEPS[0]} index={0} />
+              <StepCard step={STEPS[1]} index={1} />
+              <StepCard step={STEPS[2]} index={2} />
+              <StepCard step={STEPS[3]} index={3} />
             </div>
 
-            <svg
-              aria-hidden
-              className="pointer-events-none absolute inset-0 h-full w-full"
-              viewBox="0 0 1000 1000"
-              preserveAspectRatio="none"
-            >
-              <path
-                d={ZIGZAG_PATH}
-                stroke="currentColor"
-                strokeWidth="2"
-                fill="none"
-                vectorEffect="non-scaling-stroke"
-                className="text-border"
-              />
-              <motion.path
-                d={ZIGZAG_PATH}
-                stroke="currentColor"
-                strokeWidth="2"
-                fill="none"
-                vectorEffect="non-scaling-stroke"
-                style={{ pathLength: shouldReduce ? 1 : lineProgress }}
-                className="text-accent-brand"
-              />
-            </svg>
+            <div className="flex justify-center">
+              <div className="w-full max-w-2xl">
+                <StepCard step={STEPS[4]} index={4} isHighlight />
+              </div>
+            </div>
+
+            <DesktopFlowLines
+              lineProgress={lineProgress}
+              shouldReduce={shouldReduce}
+            />
           </div>
 
-          {/* Mobile/tablet layout: stacked cards + vertical line. */}
-          <div className="relative lg:hidden">
+          {/* Mobile/tablet layout: stacked cards with vertical line. */}
+          <div className="relative space-y-8 lg:hidden">
             <div
               aria-hidden
               className="absolute top-0 bottom-0 left-4 w-px bg-border"
@@ -179,11 +167,11 @@ export function Process() {
               style={{ scaleY: shouldReduce ? 1 : lineProgress }}
               className="absolute top-0 left-4 h-full w-px origin-top bg-accent-brand"
             />
-            <div className="space-y-8 pl-12">
-              {STEPS.map((step, index) => (
-                <StepCard key={step.title} step={step} index={index} />
-              ))}
-            </div>
+            {STEPS.map((step, index) => (
+              <div key={step.title} className="relative pl-12">
+                <StepCard step={step} index={index} isHighlight={index === 4} />
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -191,16 +179,51 @@ export function Process() {
   );
 }
 
+function DesktopFlowLines({
+  lineProgress,
+  shouldReduce,
+}: {
+  lineProgress: MotionValue<number>;
+  shouldReduce: boolean | null;
+}) {
+  return (
+    <svg
+      aria-hidden
+      className="pointer-events-none absolute inset-0 h-full w-full"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+    >
+      <path
+        d={FLOW_PATH}
+        stroke="currentColor"
+        strokeWidth="1.5"
+        fill="none"
+        vectorEffect="non-scaling-stroke"
+        className="text-border"
+      />
+      <motion.path
+        d={FLOW_PATH}
+        stroke="currentColor"
+        strokeWidth="2"
+        fill="none"
+        vectorEffect="non-scaling-stroke"
+        style={{ pathLength: shouldReduce ? 1 : lineProgress }}
+        className="text-accent-brand"
+      />
+    </svg>
+  );
+}
+
 interface StepCardProps {
   step: Step;
   index: number;
-  /** Desktop grid placement; ignored at <lg. */
-  colStart?: 1 | 2;
+  isHighlight?: boolean;
 }
 
-function StepCard({ step, index, colStart }: StepCardProps) {
+function StepCard({ step, index, isHighlight = false }: StepCardProps) {
   const shouldReduce = useReducedMotion();
   const variants = shouldReduce ? reducedReveal : reveal;
+  const Icon = step.icon;
 
   return (
     <motion.div
@@ -208,44 +231,51 @@ function StepCard({ step, index, colStart }: StepCardProps) {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.7, delay: 0.1 }}
-      className={cn(
-        "relative",
-        colStart === 1 && "lg:col-start-1",
-        colStart === 2 && "lg:col-start-2",
-      )}
+      transition={{ duration: 0.7, delay: 0.1 * index }}
+      className="relative"
     >
-      <StepCardBody step={step} index={index} />
-    </motion.div>
-  );
-}
-
-function StepCardBody({ step, index }: { step: Step; index: number }) {
-  const Icon = step.icon;
-  return (
-    <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-lg md:p-8">
-      {/* Watermark step-number — very-low-opacity Geist-bold glyph in
-          the top-right. overflow-hidden on the card clips its edges. */}
       <div
-        aria-hidden
-        className="pointer-events-none absolute -top-4 -right-4 select-none"
+        className={cn(
+          "relative overflow-hidden rounded-2xl border bg-card p-6 md:p-8",
+          // Highlight card: accent border + animated violet glow (replaces
+          // the plain shadow-lg). Non-highlight cards keep shadow-lg.
+          isHighlight
+            ? "border-accent-brand/40 animate-glow-pulse"
+            : "border-border shadow-lg",
+        )}
       >
-        <span className="font-display text-[140px] font-bold leading-none tracking-tight text-foreground/[0.04] md:text-[180px]">
-          {String(index + 1).padStart(2, "0")}
-        </span>
-      </div>
-
-      <div className="relative z-10">
-        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full border-2 border-border bg-background">
-          <Icon className="h-5 w-5 text-foreground" />
+        {/* Watermark step-number — same as the previous followup. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-4 -right-4 select-none"
+        >
+          <span className="font-display text-[140px] font-bold leading-none tracking-tight text-foreground/[0.04] md:text-[180px]">
+            {String(index + 1).padStart(2, "0")}
+          </span>
         </div>
-        <h3 className="font-display text-2xl font-semibold tracking-tight text-foreground">
-          {step.title}
-        </h3>
-        <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-          {step.description}
-        </p>
+
+        <div className="relative z-10">
+          <div
+            className={cn(
+              "mb-4 flex h-12 w-12 items-center justify-center rounded-full border-2 bg-background",
+              isHighlight ? "border-accent-brand" : "border-border",
+            )}
+          >
+            <Icon
+              className={cn(
+                "h-5 w-5",
+                isHighlight ? "text-accent-brand" : "text-foreground",
+              )}
+            />
+          </div>
+          <h3 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+            {step.title}
+          </h3>
+          <p className="mt-3 text-base leading-relaxed text-muted-foreground">
+            {step.description}
+          </p>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

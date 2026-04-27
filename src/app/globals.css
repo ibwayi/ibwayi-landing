@@ -183,6 +183,31 @@
 }
 
 /*
+ * Glow-pulse animation — used by the Process section's highlighted final
+ * card (Launch & Handover) to mark it as the success-moment. Combines
+ * the standard shadow-lg drop-shadow with an animated violet bloom.
+ * The prefers-reduced-motion media-query below short-circuits the
+ * animation to a static frame.
+ */
+@keyframes glow-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 10px 15px -3px rgb(0 0 0 / 0.1),
+      0 0 30px -5px rgba(168, 85, 247, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 10px 15px -3px rgb(0 0 0 / 0.1),
+      0 0 50px -5px rgba(168, 85, 247, 0.35);
+  }
+}
+
+@utility animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/*
  * Respect prefers-reduced-motion. CSS short-circuits all transitions and
  * animations to ~0ms; components that drive animations from JS (Motion)
  * additionally check useReducedMotion() to avoid setting `filter: blur`
