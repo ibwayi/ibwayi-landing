@@ -1,7 +1,7 @@
 export default function Home() {
   return (
-    <main className="min-h-screen flex items-center justify-center">
+    <div className="flex flex-1 items-center justify-center">
       <h1 className="text-4xl font-bold tracking-tight">ibwayi</h1>
-    </main>
+    </div>
   );
 }
