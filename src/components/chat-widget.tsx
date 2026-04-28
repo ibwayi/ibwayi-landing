@@ -15,6 +15,25 @@ interface RateLimitInfo {
 }
 
 /**
+ * Subset of the `tool-submit_lead` UIMessagePart shape we render. AI SDK
+ * v6 emits this as `{ type: "tool-<name>", state, input, output, ... }`
+ * with state cycling: input-streaming → input-available →
+ * output-available (or output-error).
+ */
+type LeadToolPart = {
+  type: "tool-submit_lead";
+  state:
+    | "input-streaming"
+    | "input-available"
+    | "output-available"
+    | "output-error"
+    | "approval-requested"
+    | "approval-responded";
+  output?: { success: boolean; message: string };
+  errorText?: string;
+};
+
+/**
  * Floating chatbot widget — bubble bottom-right, slide-in panel on click.
  *
  * Rate-limit handling: server enforces 10 messages per IP per hour via
@@ -175,27 +194,39 @@ export function ChatWidget() {
                 const text = message.parts
                   .map((p) => (p.type === "text" ? p.text : ""))
                   .join("");
-                if (!text) return null;
+
                 return (
-                  <div
-                    key={message.id}
-                    className={cn(
-                      "flex",
-                      message.role === "user"
-                        ? "justify-end"
-                        : "justify-start",
+                  <div key={message.id} className="space-y-2">
+                    {text && (
+                      <div
+                        className={cn(
+                          "flex",
+                          message.role === "user"
+                            ? "justify-end"
+                            : "justify-start",
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            "max-w-[80%] rounded-xl px-3 py-2 text-sm leading-relaxed",
+                            message.role === "user"
+                              ? "bg-accent-brand text-white"
+                              : "bg-muted text-foreground",
+                          )}
+                        >
+                          {text}
+                        </div>
+                      </div>
                     )}
-                  >
-                    <div
-                      className={cn(
-                        "max-w-[80%] rounded-xl px-3 py-2 text-sm leading-relaxed",
-                        message.role === "user"
-                          ? "bg-accent-brand text-white"
-                          : "bg-muted text-foreground",
-                      )}
-                    >
-                      {text}
-                    </div>
+                    {message.parts.map((part, idx) => {
+                      if (part.type !== "tool-submit_lead") return null;
+                      return (
+                        <LeadStatusBlock
+                          key={`${message.id}-lead-${idx}`}
+                          part={part as unknown as LeadToolPart}
+                        />
+                      );
+                    })}
                   </div>
                 );
               })}
@@ -288,5 +319,38 @@ export function ChatWidget() {
         )}
       </AnimatePresence>
     </>
+  );
+}
+
+function LeadStatusBlock({ part }: { part: LeadToolPart }) {
+  if (part.state === "output-available" && part.output) {
+    const { success, message } = part.output;
+    return (
+      <div
+        className={cn(
+          "rounded-xl border px-3 py-2 text-sm",
+          success
+            ? "border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400"
+            : "border-destructive/30 bg-destructive/10 text-destructive",
+        )}
+      >
+        {success ? "✓ " : "⚠ "}
+        {message}
+      </div>
+    );
+  }
+  if (part.state === "output-error") {
+    return (
+      <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+        ⚠ Couldn&rsquo;t reach Ibwayi right now. Please try again or visit
+        fiverr.com/ibwayi.
+      </div>
+    );
+  }
+  // input-streaming or input-available — submit is in flight.
+  return (
+    <div className="rounded-xl border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+      Submitting your details to Ibwayi…
+    </div>
   );
 }
