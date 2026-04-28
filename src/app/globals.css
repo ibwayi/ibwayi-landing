@@ -150,21 +150,28 @@
  * Diagonal stripe pattern — dark-mode only, fixed-position overlay so it
  * scrolls with the viewport instead of repeating per-section. Very dezent
  * (opacity ~0.06) and pointer-events:none so it never interferes with clicks.
- * 7.3d will refine this if needed.
+ *
+ * Wrapped in @layer base prophylactically: an unlayered `body::before`
+ * rule with `position: fixed` + `z-index: 0` could in principle override
+ * Tailwind utilities targeting body or its children (the same Cascade
+ * Layers trap that bit `body > *` in 7.4b-Followup-1). No issue today,
+ * but layering it keeps the cascade predictable.
  */
-.dark body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image: repeating-linear-gradient(
-    135deg,
-    transparent 0,
-    transparent 22px,
-    rgba(168, 85, 247, 0.06) 22px,
-    rgba(168, 85, 247, 0.06) 23px
-  );
+@layer base {
+  .dark body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      135deg,
+      transparent 0,
+      transparent 22px,
+      rgba(168, 85, 247, 0.06) 22px,
+      rgba(168, 85, 247, 0.06) 23px
+    );
+  }
 }
 
 /*
