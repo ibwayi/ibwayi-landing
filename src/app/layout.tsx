@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { GeistSans } from "geist/font/sans";
+import { ChatWidget } from "@/components/chat-widget";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
@@ -45,6 +46,7 @@ export default function RootLayout({
             {children}
             <Footer />
           </main>
+          <ChatWidget />
         </ThemeProvider>
       </body>
     </html>
