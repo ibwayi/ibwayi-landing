@@ -60,9 +60,9 @@ export function About() {
             <motion.div variants={childVariant} className="flex-1 space-y-4">
               <p className="text-base leading-relaxed text-foreground/90 md:text-lg">
                 I&rsquo;m an AI developer based in Cologne, Germany. I build
-                practical AI solutions for businesses — chatbots,
-                automations, and MVP web apps. Every project ends with you
-                owning everything: code, accounts, IP. No vendor-lock.
+                practical AI solutions for businesses: chatbots, automations,
+                and MVP web apps. Every project ends with you owning
+                everything: code, accounts, IP. No vendor-lock.
               </p>
 
               <Link

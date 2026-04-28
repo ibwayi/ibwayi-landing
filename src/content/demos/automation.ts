@@ -6,7 +6,7 @@ export const AUTOMATION_DATA: DemoPageData = {
   subtitle:
     "Webhook-driven AI workflows that connect your tools and save hours every week.",
   description:
-    "If you find yourself copying data between apps, triggering tasks manually, or processing emails one at a time — those are automation candidates. AI makes automations smarter: they can read context, make decisions, and respond in human language. I build the workflows that turn manual chores into background processes.",
+    "If you find yourself copying data between apps, triggering tasks manually, or processing emails one at a time, those are automation candidates. AI makes automations smarter: they can read context, make decisions, and respond in human language. I build the workflows that turn manual chores into background processes.",
   useCases: [
     {
       title: "Email Triage",
@@ -31,7 +31,7 @@ export const AUTOMATION_DATA: DemoPageData = {
   ],
   whatYouGet: [
     "Custom workflow tailored to your tools and data",
-    "Self-hosted (n8n on your server) OR SaaS (Zapier/Make) — your choice",
+    "Self-hosted (n8n on your server) or SaaS (Zapier/Make), your choice",
     "AI reasoning steps where they add value (not everywhere)",
     "Error handling and retry logic",
     "Logging and monitoring so you know what's happening",
@@ -65,7 +65,7 @@ export const AUTOMATION_DATA: DemoPageData = {
       step: "1",
       title: "Audit",
       description:
-        "We identify workflows worth automating. Not everything should be automated — only repetitive, high-frequency, low-decision tasks.",
+        "We identify workflows worth automating. Not everything should be automated. Only repetitive, high-frequency, low-decision tasks.",
     },
     {
       step: "2",
@@ -100,12 +100,12 @@ export const AUTOMATION_DATA: DemoPageData = {
     {
       question: "What if a step fails?",
       answer:
-        "All workflows have error handling — retry logic, fallback paths, alerts to you when something needs human attention. You won't find out about a broken automation a month later.",
+        "All workflows have error handling: retry logic, fallback paths, alerts to you when something needs human attention. You won't find out about a broken automation a month later.",
     },
     {
       question: "Can I see what's running?",
       answer:
-        "Yes. Every workflow has logs, dashboard, and alerts. You see what triggered, what happened, what failed — in real-time.",
+        "Yes. Every workflow has logs, dashboard, and alerts. You see what triggered, what happened, what failed, in real-time.",
     },
     {
       question: "What about API costs?",

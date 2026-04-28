@@ -86,7 +86,7 @@ Reply directly to ${lead.email} to follow up.`;
     from: `Ibwayi <${fromEmail}>`,
     to: [toEmail],
     replyTo: lead.email,
-    subject: `New lead — ${projectTypeLabel} — ${lead.email}`,
+    subject: `New lead: ${projectTypeLabel} from ${lead.email}`,
     html,
     text,
   });

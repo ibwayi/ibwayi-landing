@@ -6,12 +6,12 @@ export const MVP_DATA: DemoPageData = {
   subtitle:
     "Full-stack MVP web apps with auth, database, payments, and AI features. Production-ready in weeks.",
   description:
-    "Most MVPs fail not because the idea is bad, but because they take too long to build. I cut MVPs down to the smallest version that proves the value, ship it fast, and iterate based on real user feedback. Your goal isn't to launch — it's to learn whether people want what you're building.",
+    "Most MVPs fail not because the idea is bad, but because they take too long to build. I cut MVPs down to the smallest version that proves the value, ship it fast, and iterate based on real user feedback. Your goal isn't to launch. It's to learn whether people want what you're building.",
   useCases: [
     {
       title: "SaaS Tools",
       description:
-        "Internal tools, productivity apps, niche B2B SaaS. Auth, dashboards, billing, AI features — everything you need for paying users.",
+        "Internal tools, productivity apps, niche B2B SaaS. Auth, dashboards, billing, AI features: everything you need for paying users.",
     },
     {
       title: "Marketplaces",
@@ -68,7 +68,7 @@ export const MVP_DATA: DemoPageData = {
     {
       name: "AI Integration",
       description:
-        "OpenAI, Anthropic, Gemini — chosen based on your specific feature needs.",
+        "OpenAI, Anthropic, Gemini, chosen based on your specific feature needs.",
     },
   ],
   process: [
@@ -112,12 +112,12 @@ export const MVP_DATA: DemoPageData = {
     {
       question: "What does it cost?",
       answer:
-        "Fiverr packages exist for standard scopes. Custom MVPs are quoted based on scope. Discovery calls are free — we figure out tight scope before quoting.",
+        "Fiverr packages exist for standard scopes. Custom MVPs are quoted based on scope. Discovery calls are free. We figure out tight scope before quoting.",
     },
     {
       question: "Will it scale?",
       answer:
-        "MVPs aren't built for scale — they're built to validate. The stack (Next.js, Supabase, Stripe) handles thousands of users without changes. If you reach product-market fit, scaling is a different (good) problem we solve later.",
+        "MVPs aren't built for scale. They're built to validate. The stack (Next.js, Supabase, Stripe) handles thousands of users without changes. If you reach product-market fit, scaling is a different (good) problem we solve later.",
     },
     {
       question: "Who owns the code?",
@@ -127,7 +127,7 @@ export const MVP_DATA: DemoPageData = {
     {
       question: "What if I want to add features later?",
       answer:
-        "Code is documented and clean — you (or another developer) can extend it. I'm also available for follow-up projects. Most clients come back for v1.5 with the features we cut from v1.",
+        "Code is documented and clean. You (or another developer) can extend it. I'm also available for follow-up projects. Most clients come back for v1.5 with the features we cut from v1.",
     },
   ],
   ctaHeadline: "Ready to build your MVP?",

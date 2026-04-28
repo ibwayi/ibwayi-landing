@@ -30,7 +30,7 @@ const services = [
     sublabel: "Tools, Workflows, Integrations",
     headline: "AI Workflows that run themselves",
     description:
-      "Webhooks in, smart actions out. Connect tools, process documents, summarize content, route requests — all without you in the loop.",
+      "Webhooks in, smart actions out. Connect tools, process documents, summarize content, route requests, all without you in the loop.",
     tags: ["n8n", "Zapier", "Webhooks"],
     href: "/demos/automation",
   },

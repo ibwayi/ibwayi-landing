@@ -65,7 +65,7 @@ export async function POST(req: Request) {
               .string()
               .min(10)
               .describe(
-                "What the user wants built — chatbot/automation/MVP plus brief context (1-2 sentences)",
+                "What the user wants built (chatbot/automation/MVP) plus brief context (1-2 sentences)",
               ),
             company_or_website: z
               .string()
