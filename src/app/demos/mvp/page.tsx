@@ -1,7 +1,6 @@
+import { DemoPageTemplate } from "@/components/demo-page-template";
+import { MVP_DATA } from "@/content/demos/mvp";
+
 export default function MvpDemoPage() {
-  return (
-    <div className="flex flex-1 items-center justify-center">
-      <h1 className="text-4xl font-bold tracking-tight">MVP Demo</h1>
-    </div>
-  );
+  return <DemoPageTemplate data={MVP_DATA} />;
 }

@@ -83,7 +83,7 @@ Reply directly to ${lead.email} to follow up.`;
 
   const resend = new Resend(apiKey);
   const { error } = await resend.emails.send({
-    from: `Ibwayi Bot <${fromEmail}>`,
+    from: `Ibwayi <${fromEmail}>`,
     to: [toEmail],
     replyTo: lead.email,
     subject: `New lead — ${projectTypeLabel} — ${lead.email}`,

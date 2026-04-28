@@ -39,6 +39,7 @@ export function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
     if (!pathname) return false;
     if (href === "/") return pathname === "/";
     if (href === "/demos") return pathname === "/demos" || pathname.startsWith("/demos/");
+    if (href === "/about") return pathname === "/about";
     return false;
   }
 
@@ -68,7 +69,7 @@ export function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
           <MobileNavItem href="/demos" active={isActive("/demos")} onClick={close}>
             Demos
           </MobileNavItem>
-          <MobileNavItem href="/#about" active={false} onClick={close}>
+          <MobileNavItem href="/about" active={isActive("/about")} onClick={close}>
             About
           </MobileNavItem>
 

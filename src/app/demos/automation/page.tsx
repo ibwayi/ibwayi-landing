@@ -1,7 +1,6 @@
+import { DemoPageTemplate } from "@/components/demo-page-template";
+import { AUTOMATION_DATA } from "@/content/demos/automation";
+
 export default function AutomationDemoPage() {
-  return (
-    <div className="flex flex-1 items-center justify-center">
-      <h1 className="text-4xl font-bold tracking-tight">Automation Demo</h1>
-    </div>
-  );
+  return <DemoPageTemplate data={AUTOMATION_DATA} />;
 }
