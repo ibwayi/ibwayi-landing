@@ -7,6 +7,8 @@ export const CHATBOT_DATA: DemoPageData = {
     "FAQ bots, lead qualifiers, customer support, built around your business.",
   description:
     "Most chatbots fail because they're generic. They give canned answers to specific questions. I build chatbots that know your business: your products, your policies, your tone. They integrate with your tools so they can take real action, not just talk.",
+  demoScreenshot: "/demos/chatbot.png",
+  demoLiveUrl: "https://chatbot.ibwayi.com",
   useCases: [
     {
       title: "FAQ & Support",
