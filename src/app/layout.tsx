@@ -14,8 +14,72 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Ibwayi, AI Solutions Developer",
-  description: "Custom AI chatbots, automations, and MVP web apps.",
+  metadataBase: new URL("https://ibwayi.com"),
+  title: {
+    default: "Ibwayi — Custom AI Solutions Developer",
+    template: "%s | Ibwayi",
+  },
+  description:
+    "Custom AI chatbots, automation workflows, and MVP web apps. Built for businesses that want practical AI without vendor lock-in. Based in Cologne, Germany.",
+  applicationName: "Ibwayi",
+  authors: [{ name: "Pascal Gudioni", url: "https://ibwayi.com" }],
+  creator: "Pascal Gudioni",
+  publisher: "Ibwayi",
+  keywords: [
+    "AI developer",
+    "custom chatbot",
+    "AI automation",
+    "MVP web app",
+    "OpenAI integration",
+    "Anthropic Claude",
+    "freelance AI engineer",
+    "Cologne developer",
+    "Next.js developer",
+    "Supabase",
+    "Stripe integration",
+  ],
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://ibwayi.com",
+    siteName: "Ibwayi",
+    title: "Ibwayi — Custom AI Solutions Developer",
+    description:
+      "Custom AI chatbots, automation workflows, and MVP web apps. Built for businesses that want practical AI without vendor lock-in.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Ibwayi — Custom AI. Done right. Shipped fast.",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ibwayi — Custom AI Solutions Developer",
+    description: "Custom AI chatbots, automation workflows, and MVP web apps.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
