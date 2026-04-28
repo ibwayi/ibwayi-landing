@@ -1,41 +1,90 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowUpRight, MessageCircle, Send, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const MAX_USER_MESSAGES = 10;
+interface RateLimitInfo {
+  resetIn: number;
+  /** When the limit was first hit (epoch ms) — used for the live countdown. */
+  hitAt: number;
+}
 
 /**
  * Floating chatbot widget — bubble bottom-right, slide-in panel on click.
  *
- * AI SDK v6 hook: `useChat` returns `messages`, `sendMessage`, `status`,
- * `error`. We manage `input` state manually (the hook no longer wires
- * input/handleInputChange/handleSubmit like v3 did). Streaming arrives
- * as `UIMessage`s with `parts: UIMessagePart[]` — we render `parts.text`
- * for assistant + user.
+ * Rate-limit handling: server enforces 10 messages per IP per hour via
+ * Upstash Redis. When the API returns 429, the response body has
+ * `{ error: "rate_limit", resetIn: <seconds> }`. We intercept the
+ * response with a custom fetch on DefaultChatTransport, stash the
+ * resetIn into local state, and switch the panel into "limit reached"
+ * mode (CTA card + disabled input + live countdown). State auto-clears
+ * after resetIn elapses so the user can try again without a refresh.
  *
- * 10-user-message session-cap (client-side count). After cap, input
- * disabled + CTA card with View-Demos + Visit-Fiverr links. The API
- * route also enforces a 20-message-per-request hard cap.
+ * The visible "X/10 messages" counter from 7.5a was removed — server
+ * is the source of truth and a visible counter felt cheap.
  */
 export function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
+  const [rateLimit, setRateLimit] = useState<RateLimitInfo | null>(null);
+  const [now, setNow] = useState(() => Date.now());
+
   const inputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { messages, sendMessage, status, error } = useChat({
-    transport: new DefaultChatTransport({ api: "/api/chat" }),
-  });
+  // Custom fetch for the transport: detects 429 and surfaces the
+  // resetIn into React state. Returning the response normally lets
+  // AI SDK turn it into an Error (we just suppress that error in the
+  // UI when rateLimit is set).
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: "/api/chat",
+        async fetch(...args) {
+          const res = await fetch(...args);
+          if (res.status === 429) {
+            try {
+              const body = (await res.clone().json()) as {
+                resetIn?: number;
+              };
+              setRateLimit({
+                resetIn: body.resetIn ?? 3600,
+                hitAt: Date.now(),
+              });
+            } catch {
+              setRateLimit({ resetIn: 3600, hitAt: Date.now() });
+            }
+          }
+          return res;
+        },
+      }),
+    [],
+  );
+
+  const { messages, sendMessage, status, error } = useChat({ transport });
 
   const isLoading = status === "submitted" || status === "streaming";
-  const userMessageCount = messages.filter((m) => m.role === "user").length;
-  const limitReached = userMessageCount >= MAX_USER_MESSAGES;
+  const limitReached = rateLimit !== null;
+
+  // Live countdown — re-tick every 30s while the limit is active.
+  useEffect(() => {
+    if (!rateLimit) return;
+    const tick = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(tick);
+  }, [rateLimit]);
+
+  // Auto-clear the limit state once resetIn has elapsed.
+  useEffect(() => {
+    if (!rateLimit) return;
+    const ms = rateLimit.resetIn * 1000;
+    const t = setTimeout(() => setRateLimit(null), ms);
+    return () => clearTimeout(t);
+  }, [rateLimit]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -54,6 +103,16 @@ export function ChatWidget() {
     sendMessage({ text: input });
     setInput("");
   }
+
+  // Minutes remaining until reset, derived from hitAt + resetIn.
+  const resetMinutesLeft = rateLimit
+    ? Math.max(
+        1,
+        Math.ceil(
+          (rateLimit.hitAt + rateLimit.resetIn * 1000 - now) / 60_000,
+        ),
+      )
+    : 0;
 
   return (
     <>
@@ -80,7 +139,6 @@ export function ChatWidget() {
             transition={{ duration: 0.2 }}
             className="fixed right-6 bottom-6 z-50 flex h-[600px] max-h-[calc(100vh-3rem)] w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl sm:w-96"
           >
-            {/* Header */}
             <div className="flex items-center justify-between border-b border-border px-4 py-3">
               <div className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-brand/20">
@@ -105,7 +163,6 @@ export function ChatWidget() {
               </button>
             </div>
 
-            {/* Messages */}
             <div className="flex-1 space-y-3 overflow-y-auto p-4">
               {messages.length === 0 && (
                 <div className="rounded-xl bg-muted/40 p-3 text-sm text-muted-foreground">
@@ -153,7 +210,8 @@ export function ChatWidget() {
                 </div>
               )}
 
-              {error && (
+              {/* Generic error — suppressed when the rate-limit CTA covers it. */}
+              {error && !limitReached && (
                 <div className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive">
                   Something went wrong. Please try again or visit Ibwayi on
                   Fiverr.
@@ -189,13 +247,16 @@ export function ChatWidget() {
                       <ArrowUpRight className="h-3 w-3" />
                     </a>
                   </div>
+                  <div className="text-xs text-muted-foreground/70">
+                    Limit resets in ~{resetMinutesLeft} minute
+                    {resetMinutesLeft === 1 ? "" : "s"}.
+                  </div>
                 </div>
               )}
 
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input */}
             <form
               onSubmit={onSubmit}
               className="flex items-center gap-2 border-t border-border p-3"
@@ -207,7 +268,7 @@ export function ChatWidget() {
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={
                   limitReached
-                    ? "Visit Fiverr to continue"
+                    ? "You've reached the message limit for this hour. Visit Fiverr to continue →"
                     : "Ask anything about Ibwayi..."
                 }
                 disabled={limitReached || isLoading}
@@ -223,10 +284,6 @@ export function ChatWidget() {
                 <Send className="h-4 w-4" />
               </button>
             </form>
-
-            <div className="pb-2 text-center text-xs text-muted-foreground/60">
-              {userMessageCount}/{MAX_USER_MESSAGES} messages · powered by AI
-            </div>
           </motion.div>
         )}
       </AnimatePresence>
