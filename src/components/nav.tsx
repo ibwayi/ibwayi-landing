@@ -48,13 +48,14 @@ type NavItemDef = { href: string; label: string };
 const ITEMS: readonly NavItemDef[] = [
   { href: "/", label: "Home" },
   { href: "/demos", label: "Demos" },
-  { href: "/#about", label: "About" },
+  { href: "/about", label: "About" },
 ] as const;
 
 function isActive(pathname: string | null, href: string): boolean {
   if (!pathname) return false;
   if (href === "/") return pathname === "/";
   if (href === "/demos") return pathname === "/demos" || pathname.startsWith("/demos/");
+  if (href === "/about") return pathname === "/about";
   return false;
 }
 

@@ -1,7 +1,6 @@
+import { DemoPageTemplate } from "@/components/demo-page-template";
+import { CHATBOT_DATA } from "@/content/demos/chatbot";
+
 export default function ChatbotDemoPage() {
-  return (
-    <div className="flex flex-1 items-center justify-center">
-      <h1 className="text-4xl font-bold tracking-tight">Chatbot Demo</h1>
-    </div>
-  );
+  return <DemoPageTemplate data={CHATBOT_DATA} />;
 }
