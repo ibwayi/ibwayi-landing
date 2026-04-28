@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 import { ArrowRight, ArrowUpRight, Check } from "lucide-react";
@@ -17,6 +18,12 @@ export interface DemoPageData {
   title: string;
   subtitle: string;
   description: string;
+  /** Public path to the screenshot rendered in the demo slot. */
+  demoScreenshot: string;
+  /** Live demo subdomain opened by the "Try Live Demo" button. */
+  demoLiveUrl: string;
+  /** Optional credential hint shown beneath the live-demo button (mvp only). */
+  demoLoginHint?: string;
   useCases: { title: string; description: string }[];
   whatYouGet: string[];
   techStack: { name: string; description: string }[];
@@ -36,8 +43,8 @@ interface DemoPageTemplateProps {
  * via this component. Sections (top-down):
  *
  *   1. Hero (eyebrow + title + subtitle + description)
- *   2. Demo slot — "Live demo coming soon" placeholder, will be filled
- *      by 7.5e with the real interactive component for each service.
+ *   2. Demo slot — screenshot + "Try Live Demo" link to the deployed
+ *      subdomain, plus an optional credential hint (mvp only).
  *   3. Use cases
  *   4. What you get (checklist)
  *   5. Tech stack
@@ -85,25 +92,55 @@ export function DemoPageTemplate({ data }: DemoPageTemplateProps) {
           </motion.p>
         </motion.section>
 
-        {/* 2. Demo slot — replaced in 7.5e by real interactive demos */}
+        {/* 2. Demo slot — screenshot + live-subdomain link */}
         <motion.section
-          variants={childVariant}
+          variants={containerVariant}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
         >
-          <div className="rounded-2xl border border-border bg-card p-8 text-center md:p-12">
-            <p className="mb-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">
-              Live Demo
-            </p>
-            <p className="mb-2 font-display text-2xl font-semibold text-foreground">
-              Interactive demo coming soon
-            </p>
-            <p className="mx-auto max-w-md text-muted-foreground">
-              Want a hands-on preview? Get in touch. Happy to walk you
-              through a live example.
-            </p>
-          </div>
+          <motion.p
+            variants={childVariant}
+            className="mb-4 text-center text-xs font-medium uppercase tracking-widest text-muted-foreground"
+          >
+            Live Demo
+          </motion.p>
+          <motion.div
+            variants={childVariant}
+            className="overflow-hidden rounded-2xl border border-border shadow-2xl"
+          >
+            <Image
+              src={data.demoScreenshot}
+              alt={`${data.title} live demo preview`}
+              width={1600}
+              height={880}
+              className="block h-auto w-full"
+              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1024px"
+            />
+          </motion.div>
+          <motion.div
+            variants={childVariant}
+            className="mt-8 flex flex-col items-center gap-3"
+          >
+            <a
+              href={data.demoLiveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Open ${data.title} live demo (opens in new tab)`}
+              className={cn(
+                buttonVariants({ variant: "default", size: "lg" }),
+                "h-12 gap-2 px-8 text-base transition-transform hover:scale-[1.02]",
+              )}
+            >
+              Try Live Demo
+              <ArrowUpRight className="h-4 w-4" />
+            </a>
+            {data.demoLoginHint && (
+              <p className="text-center font-mono text-xs text-muted-foreground">
+                {data.demoLoginHint}
+              </p>
+            )}
+          </motion.div>
         </motion.section>
 
         {/* 3. Use cases */}

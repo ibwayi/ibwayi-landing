@@ -7,6 +7,9 @@ export const MVP_DATA: DemoPageData = {
     "Full-stack MVP web apps with auth, database, payments, and AI features. Production-ready in weeks.",
   description:
     "Most MVPs fail not because the idea is bad, but because they take too long to build. I cut MVPs down to the smallest version that proves the value, ship it fast, and iterate based on real user feedback. Your goal isn't to launch. It's to learn whether people want what you're building.",
+  demoScreenshot: "/demos/mvp.png",
+  demoLiveUrl: "https://mvp.ibwayi.com",
+  demoLoginHint: "Demo login on the page: demo@your-mvp.com",
   useCases: [
     {
       title: "SaaS Tools",

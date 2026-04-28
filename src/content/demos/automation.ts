@@ -7,6 +7,8 @@ export const AUTOMATION_DATA: DemoPageData = {
     "Webhook-driven AI workflows that connect your tools and save hours every week.",
   description:
     "If you find yourself copying data between apps, triggering tasks manually, or processing emails one at a time, those are automation candidates. AI makes automations smarter: they can read context, make decisions, and respond in human language. I build the workflows that turn manual chores into background processes.",
+  demoScreenshot: "/demos/automation.png",
+  demoLiveUrl: "https://automation.ibwayi.com",
   useCases: [
     {
       title: "Email Triage",
