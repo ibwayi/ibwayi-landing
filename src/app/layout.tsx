@@ -14,7 +14,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Ibwayi — AI Solutions Developer",
+  title: "Ibwayi, AI Solutions Developer",
   description: "Custom AI chatbots, automations, and MVP web apps.",
 };
 

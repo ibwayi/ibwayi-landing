@@ -4,9 +4,9 @@ export const CHATBOT_DATA: DemoPageData = {
   eyebrow: "AI CHATBOT",
   title: "Chatbots that actually help.",
   subtitle:
-    "FAQ bots, lead qualifiers, customer support — built around your business.",
+    "FAQ bots, lead qualifiers, customer support, built around your business.",
   description:
-    "Most chatbots fail because they're generic. They give canned answers to specific questions. I build chatbots that know your business — your products, your policies, your tone — and integrate with your tools so they can take real action, not just talk.",
+    "Most chatbots fail because they're generic. They give canned answers to specific questions. I build chatbots that know your business: your products, your policies, your tone. They integrate with your tools so they can take real action, not just talk.",
   useCases: [
     {
       title: "FAQ & Support",
@@ -33,7 +33,7 @@ export const CHATBOT_DATA: DemoPageData = {
     "Custom system prompt tuned to your brand voice",
     "Integration with your knowledge base (docs, FAQs, product info)",
     "Lead capture with email notifications or CRM integration",
-    "Floating widget OR embedded chat — your choice",
+    "Floating widget or embedded chat, your choice",
     "Rate limiting and cost protection built-in",
     "Full source code, deployable to your accounts",
     "Support window after launch",
@@ -95,7 +95,7 @@ export const CHATBOT_DATA: DemoPageData = {
     {
       question: "What does it cost?",
       answer:
-        "Fiverr packages start at fixed prices for standard scopes. For custom projects, scope determines price. Discovery calls are free — we figure out the right scope before any commitment.",
+        "Fiverr packages start at fixed prices for standard scopes. For custom projects, scope determines price. Discovery calls are free. We figure out the right scope before any commitment.",
     },
     {
       question: "Do I own the bot?",

@@ -58,7 +58,7 @@ export default function AboutPage() {
             <motion.div variants={childVariant} className="space-y-4">
               <p className="text-lg leading-relaxed text-foreground/90">
                 I&rsquo;m an AI developer based in Cologne, Germany. I build
-                practical AI solutions for businesses — chatbots that handle
+                practical AI solutions for businesses: chatbots that handle
                 real customer questions, automations that save hours of
                 manual work, and MVP web apps that get founders from idea to
                 launch.
@@ -79,8 +79,8 @@ export default function AboutPage() {
               SaaS companies. That foundation matters: AI is only as good as
               the systems it plugs into. A chatbot that doesn&rsquo;t connect
               to your real database, a workflow that doesn&rsquo;t trigger in
-              the right moments, an MVP that can&rsquo;t scale past 10 users
-              — these are integration problems disguised as AI problems.
+              the right moments, an MVP that can&rsquo;t scale past 10 users.
+              These are integration problems disguised as AI problems.
             </p>
 
             <p>
@@ -96,7 +96,7 @@ export default function AboutPage() {
             </h2>
 
             <p>
-              Every project ends with you owning everything — your code,
+              Every project ends with you owning everything: your code,
               your accounts, your IP, your deployed app. No black boxes, no
               vendor-lock, no monthly fees that disappear when our work
               together ends. You get full handover documentation, a support
@@ -108,7 +108,7 @@ export default function AboutPage() {
               I work with founders, small teams, and agencies who need
               reliable AI implementation without the overhead of an
               in-house team. Most projects ship in 1-6 weeks depending on
-              scope. Discovery calls are free — no commitment, just a
+              scope. Discovery calls are free, no commitment. Just a
               conversation about what you&rsquo;re trying to build.
             </p>
 
@@ -118,9 +118,9 @@ export default function AboutPage() {
 
             <p>
               <strong>AI providers:</strong> OpenAI, Anthropic Claude, Google
-              Gemini. I pick based on the task — Claude for nuanced
-              reasoning, OpenAI for cost-effective production, Gemini for
-              huge context windows.
+              Gemini. I pick based on the task. Claude for nuanced reasoning,
+              OpenAI for cost-effective production, Gemini for huge context
+              windows.
             </p>
 
             <p>

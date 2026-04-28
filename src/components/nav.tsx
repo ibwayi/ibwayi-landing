@@ -139,7 +139,7 @@ export function Nav() {
         <Link
           href="/"
           className="flex cursor-pointer items-center gap-2 rounded-full px-1 py-0.5 transition-colors hover:bg-muted"
-          aria-label="Home — Ibwayi"
+          aria-label="Ibwayi, home"
         >
           <motion.div
             style={{

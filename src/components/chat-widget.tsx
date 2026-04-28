@@ -168,7 +168,7 @@ export function ChatWidget() {
                     Ask about Ibwayi
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    AI assistant — instant answers
+                    AI assistant. Instant answers.
                   </div>
                 </div>
               </div>
@@ -185,7 +185,7 @@ export function ChatWidget() {
             <div className="flex-1 space-y-3 overflow-y-auto p-4">
               {messages.length === 0 && (
                 <div className="rounded-xl bg-muted/40 p-3 text-sm text-muted-foreground">
-                  Hi! I can answer questions about Ibwayi&rsquo;s services —
+                  Hi! I can answer questions about Ibwayi&rsquo;s services:
                   chatbots, automations, MVP web apps. What&rsquo;s on your mind?
                 </div>
               )}

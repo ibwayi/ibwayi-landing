@@ -100,7 +100,7 @@ export function DemoPageTemplate({ data }: DemoPageTemplateProps) {
               Interactive demo coming soon
             </p>
             <p className="mx-auto max-w-md text-muted-foreground">
-              Want a hands-on preview? Get in touch — happy to walk you
+              Want a hands-on preview? Get in touch. Happy to walk you
               through a live example.
             </p>
           </div>
